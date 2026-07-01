@@ -528,6 +528,7 @@
 const CONFIG = {
   sheetId: '1PdHOjDUI4MnjUgI53uWuyndVT1rnmUtfHtl3lAfKQnA',
   apiKey:  'AIzaSyBRLI-vQeH0ntGaB2EL8TNuLrqNL55hcyk',
+  geminiKey: 'AIzaSyAQ_Ab8RN6Ioz1j4_GGIr4iZDPAmyxXXfdy0QDA1L43uHUpmSu1Ytg',
   appsScriptUrl: 'https://script.google.com/macros/s/AKfycbzj1bcrtydgA0gpwUXiMtlTGFk-Vwa-ch3sdwFV3NOLaRffwBoPK7dn4D_A4XV047Y9/exec',
 };
 
@@ -639,8 +640,10 @@ async function loadCaches() {
     ]);
     clientesCache = clientesRows.map(r => r[0] || '').filter(Boolean);
     condicoesCache = condicoesRows.map(r => r[0] || '').filter(Boolean);
+    console.log(`Clientes: ${clientesCache.length}, Condições: ${condicoesCache.length}`);
   } catch(e) {
-    console.warn('Não foi possível carregar clientes/condições do Sheets:', e);
+    console.warn('Sheets não carregado (continua sem autocomplete):', e);
+    // Não bloqueia o processamento — só não terá autocomplete de clientes/condições
   }
 }
 
@@ -737,33 +740,38 @@ Regras importantes:
 Formato de retorno:
 {"data":"","nPedido":"","status":"Concluído","cliente":"","empresa":"","condPagamento":"","totalSImp":0,"totalCImp":0,"itens":[{"codigo":"","produto":"","qtde":1,"vlrUnit":0,"totalProd":0}]}`;
 
-  const userMessage = userContext
-    ? `Contexto e regras especiais para este pedido:\n${userContext}\n\nAgora extraia os dados do PDF anexo.`
-    : 'Extraia os dados do pedido do PDF anexo.';
+  const promptCompleto = userContext
+    ? `${systemPrompt}\n\nContexto e regras especiais para este pedido:\n${userContext}\n\nExtraia os dados do PDF anexo.`
+    : `${systemPrompt}\n\nExtraia os dados do pedido do PDF anexo.`;
 
-  // Chama o Apps Script como proxy (evita bloqueio CORS do navegador)
-  const response = await fetch(CONFIG.appsScriptUrl, {
+  // Chama o Gemini diretamente — aceita CORS, diferente da Anthropic
+  const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${CONFIG.geminiKey}`;
+
+  const response = await fetch(geminiUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      action: 'extractPedido',
-      systemPrompt,
-      userMessage,
-      pdfBase64: base64,
+      contents: [{
+        parts: [
+          { inline_data: { mime_type: 'application/pdf', data: base64 } },
+          { text: promptCompleto }
+        ]
+      }],
+      generationConfig: { temperature: 0, maxOutputTokens: 2048 }
     })
   });
 
   if (!response.ok) {
-    throw new Error(`Erro de conexão com o Apps Script (HTTP ${response.status}). Verifique se o script foi republicado.`);
+    const err = await response.text();
+    throw new Error(`Gemini API erro ${response.status}: ${err}`);
   }
 
   const data = await response.json();
 
-  if (data.status === 'error') {
-    throw new Error(data.message || 'Erro no Apps Script ao chamar a IA.');
-  }
+  let text = '';
+  try { text = data.candidates[0].content.parts[0].text.trim(); }
+  catch(e) { throw new Error('Resposta inesperada do Gemini. Tente novamente.'); }
 
-  const text = (data.result || '').trim();
   const clean = text.replace(/```json|```/g, '').trim();
 
   let parsed;
