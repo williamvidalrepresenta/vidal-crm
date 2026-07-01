@@ -528,7 +528,7 @@
 const CONFIG = {
   sheetId: '1PdHOjDUI4MnjUgI53uWuyndVT1rnmUtfHtl3lAfKQnA',
   apiKey:  'AIzaSyBRLI-vQeH0ntGaB2EL8TNuLrqNL55hcyk',
-  geminiKey: 'AIzaSyAQ_Ab8RN6Ioz1j4_GGIr4iZDPAmyxXXfdy0QDA1L43uHUpmSu1Ytg',
+  geminiKey: 'AQ.Ab8RN6KkzIeWa8RHrdNQujTenX6GnMQB2jNJSjWhBhwIjLOkVQ',
   appsScriptUrl: 'https://script.google.com/macros/s/AKfycbzj1bcrtydgA0gpwUXiMtlTGFk-Vwa-ch3sdwFV3NOLaRffwBoPK7dn4D_A4XV047Y9/exec',
 };
 
@@ -745,11 +745,14 @@ Formato de retorno:
     : `${systemPrompt}\n\nExtraia os dados do pedido do PDF anexo.`;
 
   // Chama o Gemini diretamente — aceita CORS, diferente da Anthropic
-  const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${CONFIG.geminiKey}`;
+  const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`;
 
   const response = await fetch(geminiUrl, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'x-goog-api-key': CONFIG.geminiKey,
+    },
     body: JSON.stringify({
       contents: [{
         parts: [
