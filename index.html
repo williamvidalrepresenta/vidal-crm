@@ -272,6 +272,10 @@ body { font-family: var(--font); background: var(--off); color: var(--text); min
 .classif-b { background: var(--purple-lt);color: var(--purple); }
 .classif-c { background: var(--gold-lt);  color: var(--gold); border-color: var(--gold-bd); }
 .classif-d { background: var(--surface);  color: var(--muted); }
+.classif-e { background: var(--green-lt); color: var(--green); border-color: var(--green-bd); }
+.classif-f { background: var(--orange-lt);color: var(--orange); }
+.classif-x { background: var(--sky);      color: var(--navy2); }
+.classif-z { background: var(--border);   color: var(--muted2); opacity: .85; }
 
 /* Status de frequência de visita */
 .card-freq { margin-bottom: 6px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
@@ -288,7 +292,12 @@ body { font-family: var(--font); background: var(--off); color: var(--text); min
 .chip.ch-classif-b.active { background: var(--purple); color: #fff; border-color: var(--purple); }
 .chip.ch-classif-c.active { background: var(--gold); color: #fff; border-color: var(--gold); }
 .chip.ch-classif-d.active { background: var(--muted); color: #fff; border-color: var(--muted); }
+.chip.ch-classif-e.active { background: var(--green); color: #fff; border-color: var(--green); }
+.chip.ch-classif-f.active { background: var(--orange); color: #fff; border-color: var(--orange); }
+.chip.ch-classif-x.active { background: var(--navy2); color: #fff; border-color: var(--navy2); }
+.chip.ch-classif-z.active { background: var(--muted2); color: #fff; border-color: var(--muted2); }
 .chip.ch-classif-none.active { background: var(--muted2); color: #fff; border-color: var(--muted2); }
+.chip.ch-link.active { background: var(--sky); color: var(--navy2); border-color: var(--sky); }
 
 /* Classificação tab card */
 .classif-card {
@@ -315,6 +324,10 @@ body { font-family: var(--font); background: var(--off); color: var(--text); min
 .qc-btn.qc-b:hover { border-color: var(--purple); background: var(--purple-lt); color: var(--purple); }
 .qc-btn.qc-c:hover { border-color: var(--gold); background: var(--gold-lt); color: var(--gold); }
 .qc-btn.qc-d:hover { border-color: var(--muted); background: var(--surface); color: var(--muted); }
+.qc-btn.qc-e:hover { border-color: var(--green); background: var(--green-lt); color: var(--green); }
+.qc-btn.qc-f:hover { border-color: var(--orange); background: var(--orange-lt); color: var(--orange); }
+.qc-btn.qc-more { color: var(--muted2); font-size: 14px; }
+.qc-btn.qc-more:hover { border-color: var(--muted2); background: var(--surface); }
 .classif-badge-lg {
   font-size: 13px; font-weight: 800; width: 30px; height: 30px; border-radius: 8px;
   display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer;
@@ -323,12 +336,20 @@ body { font-family: var(--font); background: var(--off); color: var(--text); min
   font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px;
   color: var(--muted); margin: 16px 0 8px; display: flex; align-items: center; gap: 7px;
 }
+.classif-section-hdr.muted-sec { opacity: .75; }
+.classif-section-divider { border-top: 1.5px dashed var(--border2); margin: 20px 0 4px; }
+.classif-link-note { font-size: 10.5px; color: var(--muted2); margin-top: 2px; }
+/* Selo de classificação discreto no card de Clientes */
+.card-classif-tag {
+  font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 5px; flex-shrink: 0;
+}
 .classif-cards { display: flex; flex-direction: column; gap: 7px; }
 .classif-popup {
   position: fixed; z-index: 300;
   background: var(--white); border-radius: var(--r2);
   box-shadow: var(--sh3); border: 1.5px solid var(--border);
-  padding: 6px; display: none; min-width: 170px;
+  padding: 6px; display: none; min-width: 180px;
+  max-height: 320px; overflow-y: auto;
 }
 .classif-popup.open { display: block; }
 .classif-opt {
@@ -355,6 +376,8 @@ body { font-family: var(--font); background: var(--off); color: var(--text); min
 .card-btn:hover { background: var(--border); color: var(--navy); }
 .card-btn.visit { color: var(--green); }
 .card-btn.visit:hover { background: var(--green-lt); }
+.card-btn.visit-alt { flex: 0 0 40px; color: var(--green); font-size: 13px; }
+.card-btn.visit-alt:hover { background: var(--green-lt); }
 .card-btn.prio-btn { color: var(--urgent); }
 .card-btn.prio-btn:hover { background: var(--urgent-lt); }
 .card-btn + .card-btn { border-left: 1px solid var(--border); }
@@ -409,9 +432,20 @@ body { font-family: var(--font); background: var(--off); color: var(--text); min
 .drawer-hdr h3 { font-size: 16px; font-weight: 700; color: var(--navy); }
 .drawer-x { background: var(--surface); border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; font-size: 16px; color: var(--muted); display: flex; align-items: center; justify-content: center; }
 .drawer-body { padding: 18px 20px 28px; }
+.drawer-footer {
+  position: sticky; bottom: 0; left: 0; right: 0;
+  background: var(--white); padding: 12px 20px calc(12px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--border); box-shadow: 0 -4px 16px rgba(0,0,0,.06);
+  z-index: 2;
+}
 
 /* Form */
 .field { margin-bottom: 14px; }
+.check-row {
+  display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 600;
+  color: var(--text2); cursor: pointer; margin-bottom: 10px; line-height: 1.3;
+}
+.check-row input[type="checkbox"] { width: 16px; height: 16px; flex-shrink: 0; accent-color: var(--blue); cursor: pointer; }
 .field label { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); margin-bottom: 5px; }
 .field input, .field select, .field textarea {
   width: 100%; padding: 10px 13px; border: 1.5px solid var(--border);
@@ -574,7 +608,7 @@ body { font-family: var(--font); background: var(--off); color: var(--text); min
 
 <div class="tabbar">
   <button class="tab-btn active" id="tabBtnClientes" onclick="switchTab('clientes')">👥 Clientes</button>
-  <button class="tab-btn" id="tabBtnClassif" onclick="switchTab('classif')">📅 Classificação</button>
+  <button class="tab-btn" id="tabBtnClassif" onclick="switchTab('classif')">📅 Visitas</button>
 </div>
 
 <!-- Config -->
@@ -645,6 +679,12 @@ body { font-family: var(--font); background: var(--off); color: var(--text); min
 
 <!-- Classificação page -->
 <div class="main page" id="pageClassif">
+  <div class="search-wrap">
+    <span class="search-icon">⌕</span>
+    <input id="classifSearchInput" type="text" placeholder="Buscar cliente, cidade, grupo..." oninput="onClassifSearch(this.value)">
+    <button class="search-clear" id="classifSearchClear" onclick="clearClassifSearch()">✕</button>
+  </div>
+
   <div class="filter-block">
     <div class="filter-row">
       <span class="filter-label">Class.</span>
@@ -653,6 +693,10 @@ body { font-family: var(--font); background: var(--off); color: var(--text); min
       <div class="chip ch-classif-b" onclick="setClassifFilter('classif','B',this)">B</div>
       <div class="chip ch-classif-c" onclick="setClassifFilter('classif','C',this)">C</div>
       <div class="chip ch-classif-d" onclick="setClassifFilter('classif','D',this)">D</div>
+      <div class="chip ch-classif-e" onclick="setClassifFilter('classif','E',this)">E</div>
+      <div class="chip ch-classif-f" onclick="setClassifFilter('classif','F',this)">F</div>
+      <div class="chip ch-classif-x" onclick="setClassifFilter('classif','X',this)">X · Sem freq.</div>
+      <div class="chip ch-classif-z" onclick="setClassifFilter('classif','Z',this)">Z · Sem agenda</div>
       <div class="chip ch-classif-none" onclick="setClassifFilter('classif','sem',this)">❔ Sem classif.</div>
     </div>
     <div class="filter-row">
@@ -661,6 +705,11 @@ body { font-family: var(--font); background: var(--off); color: var(--text); min
       <div class="chip ch-urgent" onclick="setClassifFilter('freq','atrasado',this)">🔴 Atrasados</div>
       <div class="chip ch-lembrar" onclick="setClassifFilter('freq','proximo',this)">🟠 Próximos</div>
       <div class="chip ch-green"  onclick="setClassifFilter('freq','ok',this)">🟢 Em dia</div>
+    </div>
+    <div class="filter-row">
+      <span class="filter-label">Grupo</span>
+      <div class="chip active" onclick="setClassifFilter('link','todos',this)">Todos</div>
+      <div class="chip ch-link" onclick="setClassifFilter('link','vinculados',this)">🔗 Vinculados à sede</div>
     </div>
   </div>
 
@@ -679,11 +728,15 @@ body { font-family: var(--font); background: var(--off); color: var(--text); min
 
 <!-- Classif quick popup -->
 <div class="classif-popup" id="classifPopup">
-  <div class="classif-opt" style="color:var(--blue)" onclick="setClassifQuick('A')">A · a cada 30 dias</div>
+  <div class="classif-opt" style="color:var(--blue)"   onclick="setClassifQuick('A')">A · a cada 30 dias</div>
   <div class="classif-opt" style="color:var(--purple)" onclick="setClassifQuick('B')">B · a cada 60 dias</div>
-  <div class="classif-opt" style="color:var(--gold)" onclick="setClassifQuick('C')">C · a cada 90 dias</div>
-  <div class="classif-opt" style="color:var(--muted)" onclick="setClassifQuick('D')">D · a cada 120 dias</div>
-  <div class="classif-opt" style="color:var(--muted2)" onclick="setClassifQuick('')">⚪ Remover classificação</div>
+  <div class="classif-opt" style="color:var(--gold)"   onclick="setClassifQuick('C')">C · a cada 90 dias</div>
+  <div class="classif-opt" style="color:var(--muted)"  onclick="setClassifQuick('D')">D · a cada 120 dias</div>
+  <div class="classif-opt" style="color:var(--green)"  onclick="setClassifQuick('E')">E · a cada 150 dias</div>
+  <div class="classif-opt" style="color:var(--orange)" onclick="setClassifQuick('F')">F · a cada 180 dias</div>
+  <div class="classif-opt" style="color:var(--navy2)"  onclick="setClassifQuick('X')">X · Sem frequência fixa</div>
+  <div class="classif-opt" style="color:var(--muted2)" onclick="setClassifQuick('Z')">Z · Sem agenda</div>
+  <div class="classif-opt" style="color:var(--muted2);border-top:1px solid var(--border);margin-top:4px" onclick="setClassifQuick('')">⚪ Remover classificação</div>
 </div>
 
 <div class="drawer-backdrop" id="dback" onclick="closeDrawer()"></div>
@@ -694,6 +747,12 @@ body { font-family: var(--font); background: var(--off); color: var(--text); min
     <button class="drawer-x" onclick="closeDrawer()">✕</button>
   </div>
   <div class="drawer-body" id="drawerBody"></div>
+  <div class="drawer-footer">
+    <div class="btn-row">
+      <button class="btn-s" onclick="closeDrawer()">Cancelar</button>
+      <button class="btn-p" id="saveBtn" onclick="saveClient()">Salvar</button>
+    </div>
+  </div>
 </div>
 
 <div class="overlay" id="fichaOverlay">
@@ -718,8 +777,14 @@ const MARCA_CYCLE = ['Sim','Potencial','Talvez','A. O. Rep','Fora Área','A. Cli
 const FUNIL_OPTS  = ['Ativo','Prospecção','A converter','Inativo','Pequeno/Ruim','Não Interessa','Baixada'];
 const CAT_OPTS    = ['Assistência Técnica','Assistência Técnica e Revenda','Revenda e Assist. Técnica','Revenda, Locação e Assist. Técnica','Revenda','Revenda e Locação','Locação','Consumo','Serviço','Serviço e Consumo','Outro'];
 const PRIO_OPTS   = ['Urgente','Lembrar',''];
-const CLASSIF_OPTS = ['A','B','C','D'];
-const CLASSIF_DIAS = {A:30, B:60, C:90, D:120};
+const CLASSIF_OPTS  = ['A','B','C','D','E','F','X','Z'];
+const CLASSIF_DIAS   = {A:30, B:60, C:90, D:120, E:150, F:180};
+const CLASSIF_SPECIAL = {X:'Sem frequência fixa', Z:'Sem agenda'};
+const CLASSIF_LABELS = {
+  A:'A · a cada 30 dias', B:'B · a cada 60 dias', C:'C · a cada 90 dias', D:'D · a cada 120 dias',
+  E:'E · a cada 150 dias', F:'F · a cada 180 dias',
+  X:'X · Sem frequência fixa', Z:'Z · Sem agenda (não visitar)'
+};
 
 let CFG = {
   id:  localStorage.getItem('v_id')  || SHEET_ID,
@@ -795,7 +860,7 @@ function diasDesdeVisita(brDate){
 function freqInfo(cl){
   const classif=(g(cl._d,'Classificação')||'').trim().toUpperCase();
   const limite=CLASSIF_DIAS[classif];
-  if(!limite) return null;
+  if(!limite) return null; // sem classificação, ou X/Z (sem prazo por dias)
   const ultVis=g(cl._d,'Última visita')||g(cl._d,'Última Visita');
   const dias=diasDesdeVisita(ultVis);
   if(dias===null) return {classif,limite,dias:null,restante:null,status:'sem-visita'};
@@ -809,7 +874,7 @@ function freqInfo(cl){
 function classifBadgeHtml(classif){
   if(!classif) return '';
   const c=classif.trim().toUpperCase();
-  if(!CLASSIF_DIAS[c]) return '';
+  if(!CLASSIF_DIAS[c]&&!CLASSIF_SPECIAL[c]) return '';
   return `<span class="classif-badge classif-${c.toLowerCase()}">${c}</span>`;
 }
 function freqPillHtml(fi){
@@ -832,22 +897,48 @@ function switchTab(tab){
   if(tab==='classif') renderClassifTab();
 }
 
-// ── Aba Classificação ─────────────────────────────────────────────────────────
-let cFilterClassif='todos', cFilterFreq='todos', classifTargetRow=null;
+// ── Aba Visitas (classificação + unificação de grupo) ────────────────────────
+let cFilterClassif='todos', cFilterFreq='todos', cFilterLink='todos', cSearchQ='', classifTargetRow=null;
 
 function setClassifFilter(type,val,el){
   if(type==='classif') cFilterClassif=val;
   else if(type==='freq') cFilterFreq=val;
+  else if(type==='link') cFilterLink=val;
   el.closest('.filter-row').querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
   el.classList.add('active');
   renderClassifTab();
 }
+function onClassifSearch(q){
+  cSearchQ=q.trim().toLowerCase();
+  document.getElementById('classifSearchClear').classList.toggle('visible',q.length>0);
+  renderClassifTab();
+}
+function clearClassifSearch(){document.getElementById('classifSearchInput').value='';onClassifSearch('');}
+
+// Encontra a "sede" de um cliente (mesmo Grupo/Rede, marcado como Sede do Grupo)
+function getSedeForClient(cl){
+  const grupo=(g(cl._d,'Grupo/Rede')||'').trim();
+  if(!grupo) return null;
+  return ALL.find(c=>c._r!==cl._r && (g(c._d,'Grupo/Rede')||'').trim()===grupo && g(c._d,'Sede do Grupo')==='Sim')||null;
+}
+function isVinculado(cl){
+  return g(cl._d,'Segue Sede')==='Sim' && !!getSedeForClient(cl);
+}
 
 function classifGroup(cl){
+  if(isVinculado(cl)) return 'vinculado';
   const classif=(g(cl._d,'Classificação')||'').trim().toUpperCase();
+  if(classif==='Z') return 'sem-agenda';
+  if(classif==='X') return 'sem-freq';
   if(!classif||!CLASSIF_DIAS[classif]) return 'sem';
   const fi=freqInfo(cl);
-  return fi?fi.status:'sem-visita';
+  if(!fi) return 'sem';
+  return fi.status==='sem-visita'?'ok':fi.status;
+}
+function classifMatchesSearch(cl,q){
+  if(!q) return true;
+  const hay=[cl.name,g(cl._d,'Cidade'),g(cl._d,'Rep.'),g(cl._d,'Grupo/Rede')].join(' ').toLowerCase();
+  return hay.includes(q);
 }
 
 function renderClassifTab(){
@@ -856,64 +947,67 @@ function renderClassifTab(){
     return;
   }
   let list=[...ALL];
+  if(cSearchQ) list=list.filter(c=>classifMatchesSearch(c,cSearchQ));
   if(cFilterClassif!=='todos'){
-    if(cFilterClassif==='sem') list=list.filter(c=>classifGroup(c)==='sem');
+    if(cFilterClassif==='sem') list=list.filter(c=>(g(c._d,'Classificação')||'').trim()==='');
     else list=list.filter(c=>(g(c._d,'Classificação')||'').trim().toUpperCase()===cFilterClassif);
   }
   if(cFilterFreq!=='todos') list=list.filter(c=>classifGroup(c)===cFilterFreq);
+  if(cFilterLink==='vinculados') list=list.filter(c=>isVinculado(c));
 
   // Stats (sobre a base completa, não filtrada)
   const nAtrasado=ALL.filter(c=>classifGroup(c)==='atrasado').length;
   const nProximo=ALL.filter(c=>classifGroup(c)==='proximo').length;
-  const nSem=ALL.filter(c=>classifGroup(c)==='sem').length;
-  const nOk=ALL.filter(c=>classifGroup(c)==='ok'||classifGroup(c)==='sem-visita').length;
+  const nSem=ALL.filter(c=>(g(c._d,'Classificação')||'').trim()==='').length;
+  const nOk=ALL.filter(c=>classifGroup(c)==='ok').length;
   document.getElementById('classifStats').innerHTML=`
     <div class="stat"><div class="stat-n" style="color:var(--urgent)">${nAtrasado}</div><div class="stat-l">🔴 Atrasados</div></div>
     <div class="stat"><div class="stat-n" style="color:var(--lembrar)">${nProximo}</div><div class="stat-l">🟠 Próximos</div></div>
-    <div class="stat"><div class="stat-n" style="color:var(--muted2)">${nSem}</div><div class="stat-l">❔ Sem classif.</div></div>
-    <div class="stat"><div class="stat-n" style="color:var(--green)">${nOk}</div><div class="stat-l">🟢 Em dia</div></div>`;
+    <div class="stat"><div class="stat-n" style="color:var(--green)">${nOk}</div><div class="stat-l">🟢 Em dia</div></div>
+    <div class="stat"><div class="stat-n" style="color:var(--muted2)">${nSem}</div><div class="stat-l">❔ Sem classif.</div></div>`;
 
   const el=document.getElementById('classifContent');
   if(!list.length){el.innerHTML=`<div class="empty"><div class="ei">🔎</div><p>Nenhum cliente encontrado.</p></div>`;return;}
 
-  const bothTodos = cFilterClassif==='todos' && cFilterFreq==='todos';
-  if(!bothTodos){
-    list.sort((a,b)=>{
-      const fa=freqInfo(a), fb=freqInfo(b);
-      const ra=fa&&fa.restante!=null?fa.restante:9999;
-      const rb=fb&&fb.restante!=null?fb.restante:9999;
-      return ra-rb;
-    });
-    el.innerHTML=`<div class="classif-cards">${list.map(classifCardHtml).join('')}</div>`;
-    return;
-  }
-
-  const groups={atrasado:[],proximo:[],sem:[],ok:[]};
-  list.forEach(c=>{
-    const grp=classifGroup(c);
-    if(grp==='atrasado') groups.atrasado.push(c);
-    else if(grp==='proximo') groups.proximo.push(c);
-    else if(grp==='sem') groups.sem.push(c);
-    else groups.ok.push(c); // ok + sem-visita
-  });
+  const filtrosAtivos = !(cFilterClassif==='todos' && cFilterFreq==='todos' && cFilterLink==='todos');
   const sortByRestante=(a,b)=>{
     const fa=freqInfo(a), fb=freqInfo(b);
     const ra=fa&&fa.restante!=null?fa.restante:9999;
     const rb=fb&&fb.restante!=null?fb.restante:9999;
     return ra-rb;
   };
+  if(filtrosAtivos){
+    list.sort(sortByRestante);
+    el.innerHTML=`<div class="classif-cards">${list.map(classifCardHtml).join('')}</div>`;
+    return;
+  }
+
+  const groups={atrasado:[],proximo:[],ok:[],'sem-freq':[],vinculado:[],'sem-agenda':[],sem:[]};
+  list.forEach(c=>{
+    const grp=classifGroup(c);
+    if(groups[grp]) groups[grp].push(c);
+  });
   groups.atrasado.sort(sortByRestante);
   groups.proximo.sort(sortByRestante);
 
+  const sec=(key,label,badgeColor,extraCls='')=>{
+    if(!groups[key].length) return '';
+    return `<div class="classif-section-hdr ${extraCls}">${label} <span class="sec-badge" style="background:${badgeColor}">${groups[key].length}</span></div>
+      <div class="classif-cards">${groups[key].map(classifCardHtml).join('')}</div>`;
+  };
+
   let html='';
-  if(groups.atrasado.length) html+=`<div class="classif-section-hdr">🔴 Atrasados <span class="sec-badge" style="background:var(--urgent)">${groups.atrasado.length}</span></div>
-    <div class="classif-cards">${groups.atrasado.map(classifCardHtml).join('')}</div>`;
-  if(groups.proximo.length) html+=`<div class="classif-section-hdr">🟠 Próximos do prazo <span class="sec-badge" style="background:var(--lembrar)">${groups.proximo.length}</span></div>
-    <div class="classif-cards">${groups.proximo.map(classifCardHtml).join('')}</div>`;
-  if(groups.sem.length) html+=`<div class="classif-section-hdr">❔ Sem classificação <span class="sec-badge gray">${groups.sem.length}</span></div>
-    <div class="classif-cards">${groups.sem.map(classifCardHtml).join('')}</div>`;
-  if(groups.ok.length) html+=`<div class="classif-section-hdr">🟢 Em dia <span class="sec-badge gray">${groups.ok.length}</span></div>
-    <div class="classif-cards">${groups.ok.map(classifCardHtml).join('')}</div>`;
+  html+=sec('atrasado','🔴 Atrasados','var(--urgent)');
+  html+=sec('proximo','🟠 Próximos do prazo','var(--lembrar)');
+  html+=sec('ok','🟢 Em dia','var(--green)');
+  html+=sec('sem-freq','🔵 Sem frequência fixa','var(--navy2)','muted-sec');
+  html+=sec('vinculado','🔗 Vinculados à sede','var(--muted2)','muted-sec');
+  html+=sec('sem-agenda','🚫 Sem agenda','var(--muted2)','muted-sec');
+  if(groups.sem.length){
+    html+=`<div class="classif-section-divider"></div>
+      <div class="classif-section-hdr">🗂️ Organizar — sem classificação <span class="sec-badge" style="background:var(--muted2)">${groups.sem.length}</span></div>
+      <div class="classif-cards">${groups.sem.map(classifCardHtml).join('')}</div>`;
+  }
   el.innerHTML=html;
 }
 
@@ -925,6 +1019,8 @@ function classifCardHtml(cl){
   const fi=freqInfo(cl);
   const grp=classifGroup(cl);
   const borderCls=grp==='atrasado'?'freq-atrasado-border':grp==='proximo'?'freq-proximo-border':'';
+  const vinculado=grp==='vinculado';
+  const sede=vinculado?getSedeForClient(cl):null;
 
   const sub=[];
   if(cidade) sub.push(`📍 ${cidade}${estado?' – '+estado:''}`);
@@ -932,22 +1028,30 @@ function classifCardHtml(cl){
   sub.push(ultVis?`🗓 ${ultVis}`:'🗓 sem visita registrada');
 
   let rightHtml;
-  if(!classif||!CLASSIF_DIAS[classif]){
+  if(vinculado){
+    rightHtml=`<span class="classif-badge classif-x" title="Segue a sede">🔗</span>`;
+  } else if(!classif){
     rightHtml=`<div class="classif-quick-set" onclick="event.stopPropagation()">
       <button class="qc-btn qc-a" onclick="quickSetClassif(event,${r},'A')" title="A · 30 dias">A</button>
       <button class="qc-btn qc-b" onclick="quickSetClassif(event,${r},'B')" title="B · 60 dias">B</button>
       <button class="qc-btn qc-c" onclick="quickSetClassif(event,${r},'C')" title="C · 90 dias">C</button>
       <button class="qc-btn qc-d" onclick="quickSetClassif(event,${r},'D')" title="D · 120 dias">D</button>
+      <button class="qc-btn qc-e" onclick="quickSetClassif(event,${r},'E')" title="E · 150 dias">E</button>
+      <button class="qc-btn qc-f" onclick="quickSetClassif(event,${r},'F')" title="F · 180 dias">F</button>
+      <button class="qc-btn qc-more" onclick="openClassifPopup(event,${r})" title="Mais opções (X, Z)">⋯</button>
     </div>`;
   } else {
     rightHtml=`<span class="classif-badge-lg classif-${classif.toLowerCase()}" onclick="openClassifPopup(event,${r})" title="Trocar classificação">${classif}</span>
       ${freqPillHtml(fi)}`;
   }
 
+  const linkNote=vinculado&&sede?`<div class="classif-link-note">Segue agenda de: ${escH(sede.name)}</div>`:'';
+
   return `<div class="classif-card ${borderCls}" onclick="openFicha(${r})">
     <div class="classif-card-main">
       <div class="classif-card-name">${escH(cl.name)}</div>
       <div class="classif-card-sub">${sub.map(s=>`<span>${s}</span>`).join('')}</div>
+      ${linkNote}
     </div>
     ${rightHtml}
   </div>`;
@@ -961,9 +1065,10 @@ function openClassifPopup(e,sheetRow){
   e.stopPropagation();
   classifTargetRow=sheetRow;
   const popup=document.getElementById('classifPopup');
-  popup.style.left=Math.min(e.clientX,window.innerWidth-190)+'px';
-  popup.style.top=(e.clientY-170)+'px';
   popup.classList.add('open');
+  const ph=popup.offsetHeight||320, pw=190;
+  popup.style.left=Math.max(8,Math.min(e.clientX,window.innerWidth-pw-8))+'px';
+  popup.style.top=Math.max(8,Math.min(e.clientY-ph/2,window.innerHeight-ph-8))+'px';
 }
 function setClassifQuick(val){
   document.getElementById('classifPopup').classList.remove('open');
@@ -1100,6 +1205,8 @@ function cardHtml(cl){
   if(ult_comp&&ult_comp!=='-') datas+=`<span class="card-data-item">🛒 Compra: <span class="val">${ult_comp}</span></span>`;
 
   const nota=anotacao?`<div class="card-anotacao">✏ ${escH(anotacao)}</div>`:'';
+  const classif=(g(d,'Classificação')||'').trim().toUpperCase();
+  const classifTag=classif?`<span class="card-classif-tag classif-${classif.toLowerCase()}">${classif}</span>`:'';
 
   return `<div class="card ${prioClass}">
     ${prioClass?'<div class="card-left-bar"></div>':''}
@@ -1109,7 +1216,10 @@ function cardHtml(cl){
           <div class="card-name">${escH(cl.name)}</div>
           ${grupo?`<div class="card-group">↳ ${escH(grupo)}</div>`:''}
         </div>
-        ${prioIcon}
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+          ${classifTag}
+          ${prioIcon}
+        </div>
       </div>
       <div class="card-info">${infoPills}</div>
       ${marcas?`<div class="card-marcas">${marcas}</div>`:''}
@@ -1117,7 +1227,8 @@ function cardHtml(cl){
       ${nota}
     </div>
     <div class="card-actions">
-      <button class="card-btn visit" onclick="quickVisit(event,${r})">✓ Visita hoje</button>
+      <button class="card-btn visit" onclick="quickVisit(event,${r})">✓ Hoje</button>
+      <button class="card-btn visit-alt" onclick="openVisitDatePicker(event,${r})" title="Registrar visita em outra data">📅</button>
       <button class="card-btn prio-btn" onclick="openPrioPopup(event,${r})">⚡ Prioridade</button>
       <button class="card-btn" onclick="openDrawer(${r});event.stopPropagation()">✏ Editar</button>
     </div>
@@ -1139,6 +1250,44 @@ async function quickVisit(e,sheetRow){
     await sheetWrite('update',sheetRow,rowArr);
     cl._d=rowArr;
     showToast(`Visita: ${today}`,'ok');
+    setSyncState('ok','Sincronizado');
+    applyFilters(); renderClassifTab();
+  }catch(err){setSyncState('error','Erro');showToast(err.message,'err');}
+}
+
+// Registrar visita em outra data (abre o seletor de data nativo direto no botão)
+function openVisitDatePicker(e,sheetRow){
+  e.stopPropagation();
+  let inp=document.getElementById('hiddenVisitDate');
+  if(!inp){
+    inp=document.createElement('input');
+    inp.type='date'; inp.id='hiddenVisitDate';
+    inp.style.position='fixed'; inp.style.opacity='0'; inp.style.pointerEvents='none';
+    inp.style.width='1px'; inp.style.height='1px'; inp.style.left='0'; inp.style.top='0';
+    document.body.appendChild(inp);
+  }
+  const cl=ALL.find(c=>c._r===sheetRow);
+  const curIso=cl?brToISO(g(cl._d,'Última visita')||g(cl._d,'Última Visita')):'';
+  inp.value=curIso||todayISO();
+  inp.max=todayISO();
+  const rect=e.currentTarget.getBoundingClientRect();
+  inp.style.left=rect.left+'px'; inp.style.top=(rect.top+rect.height)+'px';
+  inp.onchange=()=>{ if(inp.value) quickVisitDate(sheetRow,inp.value); };
+  if(inp.showPicker){ try{inp.showPicker();}catch(_){inp.click();} } else inp.click();
+}
+async function quickVisitDate(sheetRow,isoDate){
+  const cl=ALL.find(c=>c._r===sheetRow); if(!cl) return;
+  const brDate=isoToBR(isoDate);
+  const visitaIdx=cv('Última visita')>=0?cv('Última visita'):cv('Última Visita');
+  if(visitaIdx<0){showToast('Coluna não encontrada','err');return;}
+  const rowArr=[...cl._d];
+  while(rowArr.length<=visitaIdx) rowArr.push('');
+  rowArr[visitaIdx]=brDate;
+  try{
+    setSyncState('syncing','Salvando...');
+    await sheetWrite('update',sheetRow,rowArr);
+    cl._d=rowArr;
+    showToast(`Visita: ${brDate}`,'ok');
     setSyncState('ok','Sincronizado');
     applyFilters(); renderClassifTab();
   }catch(err){setSyncState('error','Erro');showToast(err.message,'err');}
@@ -1289,6 +1438,12 @@ function openDrawer(sheetRow){
       </div>
     </div>
     <div class="field-row">
+      <label class="check-row"><input type="checkbox" id="fSedeGrupo" ${get('Sede do Grupo')==='Sim'?'checked':''}> É a sede do grupo (referência p/ visitas e classificação)</label>
+    </div>
+    <div class="field-row">
+      <label class="check-row"><input type="checkbox" id="fSegueSede" ${get('Segue Sede')==='Sim'?'checked':''}> Segue a agenda da sede (não aparece como pendência separada)</label>
+    </div>
+    <div class="field-row">
       <div class="field"><label>Cidade</label><input id="fCidade" value="${escH(get('Cidade'))}"></div>
       <div class="field"><label>Estado</label><input id="fEstado" value="${escH(estadoVal)}"></div>
     </div>
@@ -1302,7 +1457,7 @@ function openDrawer(sheetRow){
       <div class="field"><label>Classificação</label>
         <select id="fClassif">
           <option value="" ${!get('Classificação')?'selected':''}>— Sem classificação —</option>
-          ${CLASSIF_OPTS.map(c=>`<option value="${c}" ${(get('Classificação')||'').trim().toUpperCase()===c?'selected':''}>${c} · a cada ${CLASSIF_DIAS[c]} dias</option>`).join('')}
+          ${CLASSIF_OPTS.map(c=>`<option value="${c}" ${(get('Classificação')||'').trim().toUpperCase()===c?'selected':''}>${CLASSIF_LABELS[c]}</option>`).join('')}
         </select>
       </div>
     </div>
@@ -1330,12 +1485,9 @@ function openDrawer(sheetRow){
       <div class="field"><label>Política de Desconto</label><input id="fPol" value="${escH(get('Política de desconto')||get('Política Desconto'))}"></div>
       <div class="field"><label>Telefone</label><input id="fTel" value="${escH(get('Telefone'))}"></div>
     </div>
-    <div class="field"><label>Endereço</label><input id="fEnd" value="${escH(get('Endereço'))}"></div>
+    <div class="field"><label>Endereço</label><input id="fEnd" value="${escH(get('Endereço'))}"></div>`;
 
-    <div class="btn-row" style="margin-top:22px">
-      <button class="btn-s" onclick="closeDrawer()">Cancelar</button>
-      <button class="btn-p" id="saveBtn" onclick="saveClient()">${isEdit?'💾 Salvar':'+ Adicionar cliente'}</button>
-    </div>`;
+  document.getElementById('saveBtn').textContent=isEdit?'💾 Salvar':'+ Adicionar cliente';
 
   document.getElementById('dback').classList.add('open');
   document.getElementById('drawer').classList.add('open');
@@ -1375,6 +1527,8 @@ async function saveClient(){
   const vals={
     'Nome da empresa':nome,'Nome da Empresa':nome,
     'Grupo/Rede':document.getElementById('fGrupo').value.trim(),
+    'Sede do Grupo':document.getElementById('fSedeGrupo').checked?'Sim':'',
+    'Segue Sede':document.getElementById('fSegueSede').checked?'Sim':'',
     'Categoria de negócio':document.getElementById('fCat').value,
     'Categoria':document.getElementById('fCat').value,
     'Rep.':document.getElementById('fRep').value,
