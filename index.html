@@ -188,6 +188,10 @@ body { font-family: var(--font); background: var(--off); color: var(--text); min
 }
 .stat-n { font-size: 24px; font-weight: 800; line-height: 1; color: var(--navy); }
 .stat-l { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); margin-top: 4px; }
+.stat.stat-clickable { cursor: pointer; transition: border-color .12s, box-shadow .12s, background .12s; }
+.stat.stat-clickable:hover { border-color: var(--blue); box-shadow: var(--sh2); }
+.stat.stat-clickable.active { border-color: var(--navy); border-width: 2px; background: var(--surface); box-shadow: var(--sh2); }
+.stat.stat-clickable.active .stat-l { color: var(--navy); }
 
 /* ── Section label ── */
 .sec-label {
@@ -303,28 +307,23 @@ body { font-family: var(--font); background: var(--off); color: var(--text); min
 .classif-card {
   background: var(--white); border-radius: var(--r2);
   border: 1.5px solid var(--border); box-shadow: var(--sh);
-  padding: 11px 14px; display: flex; flex-direction: column;
-  transition: box-shadow .15s, border-color .15s;
+  padding: 11px 14px; display: flex; align-items: center; gap: 10px;
+  cursor: pointer; transition: box-shadow .15s, border-color .15s;
 }
 .classif-card:hover { box-shadow: var(--sh2); border-color: var(--blue); }
 .classif-card.freq-atrasado-border { border-left: 3px solid var(--urgent); }
 .classif-card.freq-proximo-border  { border-left: 3px solid var(--lembrar); }
-.classif-card-top { display: flex; align-items: center; gap: 10px; cursor: pointer; }
 .classif-card-main { flex: 1; min-width: 0; }
 .classif-card-name { font-size: 13.5px; font-weight: 700; color: var(--navy); line-height: 1.3; }
 .classif-card-sub { font-size: 11px; color: var(--muted); margin-top: 2px; display: flex; gap: 8px; flex-wrap: wrap; }
-.classif-card-bottom {
-  display: flex; justify-content: flex-end; gap: 6px;
-  margin-top: 9px; padding-top: 8px; border-top: 1px solid var(--border);
+.classif-card-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; max-width: 45%; }
+.cv-cal-btn {
+  width: 28px; height: 28px; border-radius: 7px; border: 1.5px solid var(--border);
+  background: var(--white); font-size: 13px; cursor: pointer; color: var(--muted);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  transition: all .12s;
 }
-.cv-btn {
-  padding: 5px 11px; border-radius: 6px; border: 1.5px solid var(--border);
-  background: var(--white); font-size: 11px; font-weight: 700; color: var(--green);
-  cursor: pointer; font-family: var(--font); transition: background .12s;
-}
-.cv-btn:hover { background: var(--green-lt); }
-.cv-btn.cv-alt { color: var(--muted); flex: 0 0 auto; padding: 5px 9px; }
-.cv-btn.cv-alt:hover { background: var(--surface); }
+.cv-cal-btn:hover { border-color: var(--blue); background: var(--blue-lt); color: var(--blue); }
 .classif-quick-set { display: flex; gap: 4px; flex-shrink: 0; }
 .qc-btn {
   width: 26px; height: 26px; border-radius: 6px; border: 1.5px solid var(--border);
@@ -668,12 +667,6 @@ body { font-family: var(--font); background: var(--off); color: var(--text); min
       <div class="chip"             onclick="setFilter('funil','Inativo',this)">Inativo</div>
     </div>
     <div class="filter-row">
-      <span class="filter-label">Urgência</span>
-      <div class="chip active"      onclick="setFilter('prio','todos',this)" id="prioChipTodos">Todas</div>
-      <div class="chip ch-urgent"   onclick="setFilter('prio','Urgente',this)">🔴 Urgente</div>
-      <div class="chip ch-lembrar"  onclick="setFilter('prio','Lembrar',this)">🟡 Lembrar</div>
-    </div>
-    <div class="filter-row">
       <span class="filter-label">Rep.</span>
       <div class="chip active"      onclick="setFilter('rep','todos',this)" id="repChipTodos">Todos</div>
       <div class="chip"             onclick="setFilter('rep','William',this)">William</div>
@@ -699,25 +692,18 @@ body { font-family: var(--font); background: var(--off); color: var(--text); min
   </div>
 
   <div class="filter-block">
-    <div class="filter-row">
+    <div class="filter-row" id="classifChipRow">
       <span class="filter-label">Class.</span>
-      <div class="chip active"       onclick="setClassifFilter('classif','todos',this)">Todas</div>
-      <div class="chip ch-classif-a" onclick="setClassifFilter('classif','A',this)">A</div>
-      <div class="chip ch-classif-b" onclick="setClassifFilter('classif','B',this)">B</div>
-      <div class="chip ch-classif-c" onclick="setClassifFilter('classif','C',this)">C</div>
-      <div class="chip ch-classif-d" onclick="setClassifFilter('classif','D',this)">D</div>
-      <div class="chip ch-classif-e" onclick="setClassifFilter('classif','E',this)">E</div>
-      <div class="chip ch-classif-f" onclick="setClassifFilter('classif','F',this)">F</div>
-      <div class="chip ch-classif-x" onclick="setClassifFilter('classif','X',this)">X · Sem freq.</div>
-      <div class="chip ch-classif-z" onclick="setClassifFilter('classif','Z',this)">Z · Sem agenda</div>
-      <div class="chip ch-classif-none" onclick="setClassifFilter('classif','sem',this)">❔ Sem classif.</div>
-    </div>
-    <div class="filter-row">
-      <span class="filter-label">Prazo</span>
-      <div class="chip active"    onclick="setClassifFilter('freq','todos',this)">Todos</div>
-      <div class="chip ch-urgent" onclick="setClassifFilter('freq','atrasado',this)">🔴 Atrasados</div>
-      <div class="chip ch-lembrar" onclick="setClassifFilter('freq','proximo',this)">🟠 Próximos</div>
-      <div class="chip ch-green"  onclick="setClassifFilter('freq','ok',this)">🟢 Em dia</div>
+      <div class="chip active"       data-classif="todos" onclick="setClassifFilter('classif','todos',this)">Todas</div>
+      <div class="chip ch-classif-a" data-classif="A" onclick="setClassifFilter('classif','A',this)">A</div>
+      <div class="chip ch-classif-b" data-classif="B" onclick="setClassifFilter('classif','B',this)">B</div>
+      <div class="chip ch-classif-c" data-classif="C" onclick="setClassifFilter('classif','C',this)">C</div>
+      <div class="chip ch-classif-d" data-classif="D" onclick="setClassifFilter('classif','D',this)">D</div>
+      <div class="chip ch-classif-e" data-classif="E" onclick="setClassifFilter('classif','E',this)">E</div>
+      <div class="chip ch-classif-f" data-classif="F" onclick="setClassifFilter('classif','F',this)">F</div>
+      <div class="chip ch-classif-x" data-classif="X" onclick="setClassifFilter('classif','X',this)">X · Sem freq.</div>
+      <div class="chip ch-classif-z" data-classif="Z" onclick="setClassifFilter('classif','Z',this)">Z · Sem agenda</div>
+      <div class="chip ch-classif-none" data-classif="sem" onclick="setClassifFilter('classif','sem',this)">❔ Sem classif.</div>
     </div>
     <div class="filter-row">
       <span class="filter-label">Rep.</span>
@@ -919,6 +905,20 @@ function switchTab(tab){
 // ── Aba Visitas (classificação + unificação de grupo) ────────────────────────
 let cFilterClassif='todos', cFilterFreq='todos', cFilterLink='todos', cFilterRep='todos', cSearchQ='', classifTargetRow=null;
 
+function toggleClassifStat(type,val){
+  if(type==='freq'){
+    cFilterFreq = (cFilterFreq===val) ? 'todos' : val;
+  } else if(type==='classif'){
+    cFilterClassif = (cFilterClassif===val) ? 'todos' : val;
+    const row=document.getElementById('classifChipRow');
+    if(row){
+      row.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+      const activeChip=row.querySelector(`.chip[data-classif="${cFilterClassif}"]`);
+      (activeChip||row.querySelector('.chip')).classList.add('active');
+    }
+  }
+  renderClassifTab();
+}
 function setClassifFilter(type,val,el){
   if(type==='classif') cFilterClassif=val;
   else if(type==='freq') cFilterFreq=val;
@@ -982,10 +982,10 @@ function renderClassifTab(){
   const nSem=ALL.filter(c=>(g(c._d,'Classificação')||'').trim()==='').length;
   const nOk=ALL.filter(c=>classifGroup(c)==='ok').length;
   document.getElementById('classifStats').innerHTML=`
-    <div class="stat"><div class="stat-n" style="color:var(--urgent)">${nAtrasado}</div><div class="stat-l">🔴 Atrasados</div></div>
-    <div class="stat"><div class="stat-n" style="color:var(--lembrar)">${nProximo}</div><div class="stat-l">🟠 Próximos</div></div>
-    <div class="stat"><div class="stat-n" style="color:var(--green)">${nOk}</div><div class="stat-l">🟢 Em dia</div></div>
-    <div class="stat"><div class="stat-n" style="color:var(--muted2)">${nSem}</div><div class="stat-l">❔ Sem classif.</div></div>`;
+    <div class="stat stat-clickable ${cFilterFreq==='atrasado'?'active':''}" onclick="toggleClassifStat('freq','atrasado')"><div class="stat-n" style="color:var(--urgent)">${nAtrasado}</div><div class="stat-l">🔴 Atrasados</div></div>
+    <div class="stat stat-clickable ${cFilterFreq==='proximo'?'active':''}" onclick="toggleClassifStat('freq','proximo')"><div class="stat-n" style="color:var(--lembrar)">${nProximo}</div><div class="stat-l">🟠 Próximos</div></div>
+    <div class="stat stat-clickable ${cFilterFreq==='ok'?'active':''}" onclick="toggleClassifStat('freq','ok')"><div class="stat-n" style="color:var(--green)">${nOk}</div><div class="stat-l">🟢 Em dia</div></div>
+    <div class="stat stat-clickable ${cFilterClassif==='sem'?'active':''}" onclick="toggleClassifStat('classif','sem')"><div class="stat-n" style="color:var(--muted2)">${nSem}</div><div class="stat-l">❔ Sem classif.</div></div>`;
 
   const el=document.getElementById('classifContent');
   if(!list.length){el.innerHTML=`<div class="empty"><div class="ei">🔎</div><p>Nenhum cliente encontrado.</p></div>`;return;}
@@ -1048,11 +1048,13 @@ function classifCardHtml(cl){
   if(rep) sub.push(`👤 ${rep}`);
   sub.push(ultVis?`🗓 ${ultVis}`:'🗓 sem visita registrada');
 
+  const calBtn=`<button class="cv-cal-btn" onclick="openVisitDatePicker(event,${r})" title="Registrar visita em outra data">📅</button>`;
+
   let rightHtml;
   if(vinculado){
-    rightHtml=`<span class="classif-badge classif-x" title="Segue a sede">🔗</span>`;
+    rightHtml=`${calBtn}<span class="classif-badge classif-x" title="Segue a sede">🔗</span>`;
   } else if(!classif){
-    rightHtml=`<div class="classif-quick-set" onclick="event.stopPropagation()">
+    rightHtml=`${calBtn}<div class="classif-quick-set" onclick="event.stopPropagation()">
       <button class="qc-btn qc-a" onclick="quickSetClassif(event,${r},'A')" title="A · 30 dias">A</button>
       <button class="qc-btn qc-b" onclick="quickSetClassif(event,${r},'B')" title="B · 60 dias">B</button>
       <button class="qc-btn qc-c" onclick="quickSetClassif(event,${r},'C')" title="C · 90 dias">C</button>
@@ -1062,24 +1064,20 @@ function classifCardHtml(cl){
       <button class="qc-btn qc-more" onclick="openClassifPopup(event,${r})" title="Mais opções (X, Z)">⋯</button>
     </div>`;
   } else {
-    rightHtml=`<span class="classif-badge-lg classif-${classif.toLowerCase()}" onclick="openClassifPopup(event,${r})" title="Trocar classificação">${classif}</span>
+    rightHtml=`${calBtn}<span class="classif-badge-lg classif-${classif.toLowerCase()}" onclick="openClassifPopup(event,${r})" title="Trocar classificação">${classif}</span>
       ${freqPillHtml(fi)}`;
   }
 
   const linkNote=vinculado&&sede?`<div class="classif-link-note">Segue agenda de: ${escH(sede.name)}</div>`:'';
 
-  return `<div class="classif-card ${borderCls}">
-    <div class="classif-card-top" onclick="openFicha(${r})">
-      <div class="classif-card-main">
-        <div class="classif-card-name">${escH(cl.name)}</div>
-        <div class="classif-card-sub">${sub.map(s=>`<span>${s}</span>`).join('')}</div>
-        ${linkNote}
-      </div>
-      ${rightHtml}
+  return `<div class="classif-card ${borderCls}" onclick="openFicha(${r})">
+    <div class="classif-card-main">
+      <div class="classif-card-name">${escH(cl.name)}</div>
+      <div class="classif-card-sub">${sub.map(s=>`<span>${s}</span>`).join('')}</div>
+      ${linkNote}
     </div>
-    <div class="classif-card-bottom">
-      <button class="cv-btn" onclick="quickVisit(event,${r})">✓ Visitei hoje</button>
-      <button class="cv-btn cv-alt" onclick="openVisitDatePicker(event,${r})" title="Registrar visita em outra data">📅</button>
+    <div class="classif-card-right" onclick="event.stopPropagation()">
+      ${rightHtml}
     </div>
   </div>`;
 }
@@ -1129,8 +1127,13 @@ function renderStats(){
   document.getElementById('stats').innerHTML=`
     <div class="stat"><div class="stat-n">${at}</div><div class="stat-l">Ativos</div></div>
     <div class="stat"><div class="stat-n" style="color:var(--blue)">${pr}</div><div class="stat-l">Prospecção</div></div>
-    <div class="stat"><div class="stat-n" style="color:var(--urgent)">${urg}</div><div class="stat-l">🔴 Urgente</div></div>
-    <div class="stat"><div class="stat-n" style="color:var(--lembrar)">${lem}</div><div class="stat-l">🟡 Lembrar</div></div>`;
+    <div class="stat stat-clickable ${fPrio==='Urgente'?'active':''}" onclick="toggleStatPrio('Urgente')"><div class="stat-n" style="color:var(--urgent)">${urg}</div><div class="stat-l">🔴 Urgente</div></div>
+    <div class="stat stat-clickable ${fPrio==='Lembrar'?'active':''}" onclick="toggleStatPrio('Lembrar')"><div class="stat-n" style="color:var(--lembrar)">${lem}</div><div class="stat-l">🟡 Lembrar</div></div>`;
+}
+function toggleStatPrio(val){
+  fPrio = (fPrio===val) ? 'todos' : val;
+  renderStats();
+  applyFilters();
 }
 
 // ── Filters ───────────────────────────────────────────────────────────────────
