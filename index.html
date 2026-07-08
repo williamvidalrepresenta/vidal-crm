@@ -303,15 +303,28 @@ body { font-family: var(--font); background: var(--off); color: var(--text); min
 .classif-card {
   background: var(--white); border-radius: var(--r2);
   border: 1.5px solid var(--border); box-shadow: var(--sh);
-  padding: 11px 14px; display: flex; align-items: center; gap: 10px;
-  cursor: pointer; transition: box-shadow .15s, border-color .15s;
+  padding: 11px 14px; display: flex; flex-direction: column;
+  transition: box-shadow .15s, border-color .15s;
 }
 .classif-card:hover { box-shadow: var(--sh2); border-color: var(--blue); }
 .classif-card.freq-atrasado-border { border-left: 3px solid var(--urgent); }
 .classif-card.freq-proximo-border  { border-left: 3px solid var(--lembrar); }
+.classif-card-top { display: flex; align-items: center; gap: 10px; cursor: pointer; }
 .classif-card-main { flex: 1; min-width: 0; }
 .classif-card-name { font-size: 13.5px; font-weight: 700; color: var(--navy); line-height: 1.3; }
 .classif-card-sub { font-size: 11px; color: var(--muted); margin-top: 2px; display: flex; gap: 8px; flex-wrap: wrap; }
+.classif-card-bottom {
+  display: flex; justify-content: flex-end; gap: 6px;
+  margin-top: 9px; padding-top: 8px; border-top: 1px solid var(--border);
+}
+.cv-btn {
+  padding: 5px 11px; border-radius: 6px; border: 1.5px solid var(--border);
+  background: var(--white); font-size: 11px; font-weight: 700; color: var(--green);
+  cursor: pointer; font-family: var(--font); transition: background .12s;
+}
+.cv-btn:hover { background: var(--green-lt); }
+.cv-btn.cv-alt { color: var(--muted); flex: 0 0 auto; padding: 5px 9px; }
+.cv-btn.cv-alt:hover { background: var(--surface); }
 .classif-quick-set { display: flex; gap: 4px; flex-shrink: 0; }
 .qc-btn {
   width: 26px; height: 26px; border-radius: 6px; border: 1.5px solid var(--border);
@@ -707,6 +720,12 @@ body { font-family: var(--font); background: var(--off); color: var(--text); min
       <div class="chip ch-green"  onclick="setClassifFilter('freq','ok',this)">🟢 Em dia</div>
     </div>
     <div class="filter-row">
+      <span class="filter-label">Rep.</span>
+      <div class="chip active" onclick="setClassifFilter('rep','todos',this)">Todos</div>
+      <div class="chip" onclick="setClassifFilter('rep','William',this)">William</div>
+      <div class="chip" onclick="setClassifFilter('rep','James',this)">James</div>
+    </div>
+    <div class="filter-row">
       <span class="filter-label">Grupo</span>
       <div class="chip active" onclick="setClassifFilter('link','todos',this)">Todos</div>
       <div class="chip ch-link" onclick="setClassifFilter('link','vinculados',this)">🔗 Vinculados à sede</div>
@@ -898,12 +917,13 @@ function switchTab(tab){
 }
 
 // ── Aba Visitas (classificação + unificação de grupo) ────────────────────────
-let cFilterClassif='todos', cFilterFreq='todos', cFilterLink='todos', cSearchQ='', classifTargetRow=null;
+let cFilterClassif='todos', cFilterFreq='todos', cFilterLink='todos', cFilterRep='todos', cSearchQ='', classifTargetRow=null;
 
 function setClassifFilter(type,val,el){
   if(type==='classif') cFilterClassif=val;
   else if(type==='freq') cFilterFreq=val;
   else if(type==='link') cFilterLink=val;
+  else if(type==='rep') cFilterRep=val;
   el.closest('.filter-row').querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
   el.classList.add('active');
   renderClassifTab();
@@ -954,6 +974,7 @@ function renderClassifTab(){
   }
   if(cFilterFreq!=='todos') list=list.filter(c=>classifGroup(c)===cFilterFreq);
   if(cFilterLink==='vinculados') list=list.filter(c=>isVinculado(c));
+  if(cFilterRep!=='todos') list=list.filter(c=>g(c._d,'Rep.')===cFilterRep);
 
   // Stats (sobre a base completa, não filtrada)
   const nAtrasado=ALL.filter(c=>classifGroup(c)==='atrasado').length;
@@ -969,7 +990,7 @@ function renderClassifTab(){
   const el=document.getElementById('classifContent');
   if(!list.length){el.innerHTML=`<div class="empty"><div class="ei">🔎</div><p>Nenhum cliente encontrado.</p></div>`;return;}
 
-  const filtrosAtivos = !(cFilterClassif==='todos' && cFilterFreq==='todos' && cFilterLink==='todos');
+  const filtrosAtivos = !(cFilterClassif==='todos' && cFilterFreq==='todos' && cFilterLink==='todos' && cFilterRep==='todos');
   const sortByRestante=(a,b)=>{
     const fa=freqInfo(a), fb=freqInfo(b);
     const ra=fa&&fa.restante!=null?fa.restante:9999;
@@ -1047,13 +1068,19 @@ function classifCardHtml(cl){
 
   const linkNote=vinculado&&sede?`<div class="classif-link-note">Segue agenda de: ${escH(sede.name)}</div>`:'';
 
-  return `<div class="classif-card ${borderCls}" onclick="openFicha(${r})">
-    <div class="classif-card-main">
-      <div class="classif-card-name">${escH(cl.name)}</div>
-      <div class="classif-card-sub">${sub.map(s=>`<span>${s}</span>`).join('')}</div>
-      ${linkNote}
+  return `<div class="classif-card ${borderCls}">
+    <div class="classif-card-top" onclick="openFicha(${r})">
+      <div class="classif-card-main">
+        <div class="classif-card-name">${escH(cl.name)}</div>
+        <div class="classif-card-sub">${sub.map(s=>`<span>${s}</span>`).join('')}</div>
+        ${linkNote}
+      </div>
+      ${rightHtml}
     </div>
-    ${rightHtml}
+    <div class="classif-card-bottom">
+      <button class="cv-btn" onclick="quickVisit(event,${r})">✓ Visitei hoje</button>
+      <button class="cv-btn cv-alt" onclick="openVisitDatePicker(event,${r})" title="Registrar visita em outra data">📅</button>
+    </div>
   </div>`;
 }
 
@@ -1441,7 +1468,14 @@ function openDrawer(sheetRow){
       <label class="check-row"><input type="checkbox" id="fSedeGrupo" ${get('Sede do Grupo')==='Sim'?'checked':''}> É a sede do grupo (referência p/ visitas e classificação)</label>
     </div>
     <div class="field-row">
-      <label class="check-row"><input type="checkbox" id="fSegueSede" ${get('Segue Sede')==='Sim'?'checked':''}> Segue a agenda da sede (não aparece como pendência separada)</label>
+      <div class="field">
+        <label>Segue a agenda da sede?</label>
+        <select id="fSegueSede">
+          <option value="" ${get('Segue Sede')!=='Sim'&&get('Segue Sede')!=='Não'?'selected':''}>— Não decidido ainda —</option>
+          <option value="Sim" ${get('Segue Sede')==='Sim'?'selected':''}>Sim — não aparece como pendência separada</option>
+          <option value="Não" ${get('Segue Sede')==='Não'?'selected':''}>Não — gerenciar de forma independente</option>
+        </select>
+      </div>
     </div>
     <div class="field-row">
       <div class="field"><label>Cidade</label><input id="fCidade" value="${escH(get('Cidade'))}"></div>
@@ -1528,7 +1562,7 @@ async function saveClient(){
     'Nome da empresa':nome,'Nome da Empresa':nome,
     'Grupo/Rede':document.getElementById('fGrupo').value.trim(),
     'Sede do Grupo':document.getElementById('fSedeGrupo').checked?'Sim':'',
-    'Segue Sede':document.getElementById('fSegueSede').checked?'Sim':'',
+    'Segue Sede':document.getElementById('fSegueSede').value,
     'Categoria de negócio':document.getElementById('fCat').value,
     'Categoria':document.getElementById('fCat').value,
     'Rep.':document.getElementById('fRep').value,
