@@ -559,6 +559,68 @@ body { font-family: var(--font); background: var(--off); color: var(--text); min
 .ficha-body { padding: 20px; }
 .ficha-facts { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 16px; }
 .ficha-fact { background: var(--surface); border-radius: var(--r); padding: 10px 12px; border: 1px solid var(--border); }
+
+/* ── Agenda tab ── */
+.agenda-nav { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 14px; }
+.agenda-nav-btn {
+  background: var(--white); border: 1.5px solid var(--border); border-radius: var(--r);
+  padding: 7px 12px; font-size: 13px; font-weight: 600; color: var(--navy); cursor: pointer;
+  box-shadow: var(--sh); font-family: var(--font);
+}
+.agenda-nav-btn:hover { border-color: var(--blue); color: var(--blue); }
+.agenda-nav-btn.today { background: var(--navy); color: #fff; border-color: var(--navy); }
+.agenda-week-label { font-size: 14px; font-weight: 700; color: var(--navy); min-width: 130px; text-align: center; }
+.agenda-grid { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; }
+.agenda-day-col {
+  flex: 1 1 150px; min-width: 150px; background: var(--white);
+  border: 1.5px solid var(--border); border-radius: var(--r2); box-shadow: var(--sh);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.agenda-day-col.weekend { flex: 0 0 110px; min-width: 110px; background: var(--surface); }
+.agenda-day-hdr {
+  background: var(--navy2); color: #fff; font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .5px; padding: 8px 10px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.agenda-day-date { font-size: 10px; font-weight: 600; color: rgba(255,255,255,.75); }
+.agenda-day-body { padding: 8px; display: flex; flex-direction: column; gap: 6px; min-height: 60px; }
+.agenda-empty-day { font-size: 11px; color: var(--muted2); text-align: center; padding: 10px 0; }
+.agenda-add-btn {
+  background: var(--blue-lt); border: 1.5px dashed var(--sky); border-radius: var(--r);
+  color: var(--blue); font-size: 11px; font-weight: 700; padding: 7px; cursor: pointer;
+  font-family: var(--font); margin-top: 2px;
+}
+.agenda-add-btn:hover { background: var(--sky); }
+.agenda-card {
+  background: var(--off); border: 1.5px solid var(--border); border-radius: var(--r);
+  padding: 8px 9px; font-size: 12px; position: relative;
+}
+.agenda-card.ag-realizada { border-color: var(--green-bd); background: var(--green-lt); }
+.agenda-card.ag-cancelada { border-color: var(--border); background: var(--surface); opacity: .6; text-decoration: line-through; }
+.ag-card-name { font-weight: 700; color: var(--navy); font-size: 12.5px; margin-bottom: 2px; }
+.ag-card-meta { font-size: 11px; color: var(--muted); margin-bottom: 2px; }
+.ag-card-obs { font-size: 11px; color: var(--text2); margin-bottom: 4px; font-style: italic; }
+.ag-card-status { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; color: var(--muted2); margin-bottom: 4px; }
+.ag-card-actions { display: flex; gap: 4px; }
+.ag-card-actions button {
+  border: none; background: var(--white); border: 1px solid var(--border); border-radius: 6px;
+  width: 22px; height: 22px; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+.ag-card-actions button:hover { border-color: var(--blue); }
+.agenda-semdia-block {
+  background: var(--white); border: 1.5px solid var(--border); border-radius: var(--r2);
+  box-shadow: var(--sh); padding: 12px; margin-top: 14px;
+}
+.agenda-semdia-hdr { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); margin-bottom: 8px; }
+.agenda-semdia-cards { display: flex; flex-wrap: wrap; gap: 8px; }
+.agenda-semdia-cards .agenda-card { flex: 1 1 220px; max-width: 280px; }
+.agenda-modal label { display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); margin-bottom: 5px; margin-top: 12px; }
+.agenda-modal label:first-child { margin-top: 0; }
+.agenda-modal input, .agenda-modal select {
+  width: 100%; padding: 10px 13px; border: 1.5px solid var(--border);
+  border-radius: var(--r); font-size: 13px; color: var(--text);
+  background: var(--white); outline: none; font-family: var(--font);
+}
 .ficha-fact .ff-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); margin-bottom: 3px; }
 .ficha-fact .ff-val { font-size: 13px; font-weight: 700; color: var(--navy); }
 .ficha-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 13px; gap: 12px; }
@@ -585,6 +647,13 @@ body { font-family: var(--font); background: var(--off); color: var(--text); min
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 .toast.ok  { background: var(--green); }
 .toast.err { background: var(--red); }
+.toast.has-undo { display: flex; align-items: center; gap: 12px; pointer-events: auto; }
+.toast-undo {
+  background: rgba(255,255,255,.22); border: none; color: #fff; font-weight: 800;
+  font-size: 12px; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-family: var(--font);
+  flex-shrink: 0;
+}
+.toast-undo:hover { background: rgba(255,255,255,.34); }
 
 /* ── States ── */
 .empty { text-align: center; padding: 52px 20px; color: var(--muted); }
@@ -621,6 +690,7 @@ body { font-family: var(--font); background: var(--off); color: var(--text); min
 <div class="tabbar">
   <button class="tab-btn active" id="tabBtnClientes" onclick="switchTab('clientes')">👥 Clientes</button>
   <button class="tab-btn" id="tabBtnClassif" onclick="switchTab('classif')">📅 Visitas</button>
+  <button class="tab-btn" id="tabBtnAgenda" onclick="switchTab('agenda')">🗓️ Agenda</button>
 </div>
 
 <!-- Config -->
@@ -677,6 +747,15 @@ body { font-family: var(--font); background: var(--off); color: var(--text); min
         <button class="city-clear" id="cityClear" onclick="clearCity()">✕</button>
       </div>
     </div>
+    <div class="filter-row">
+      <span class="filter-label">Marca</span>
+      <div class="chip active" onclick="setFilter('marca','todos',this)">Todas</div>
+      <div class="chip" onclick="setFilter('marca','Rothenberger',this)">Rothenberger</div>
+      <div class="chip" onclick="setFilter('marca','Chiaperini',this)">Chiaperini</div>
+      <div class="chip" onclick="setFilter('marca','Techto',this)">Techto</div>
+      <div class="chip" onclick="setFilter('marca','Presto',this)">Presto</div>
+      <div class="chip" onclick="setFilter('marca','Horbach',this)">Horbach</div>
+    </div>
   </div>
 
   <div class="stats" id="stats"></div>
@@ -722,7 +801,35 @@ body { font-family: var(--font); background: var(--off); color: var(--text); min
   <div id="classifContent"></div>
 </div>
 
+<!-- Agenda page -->
+<div class="main page" id="pageAgenda">
+  <div class="agenda-nav">
+    <button class="agenda-nav-btn" onclick="agendaPrevWeek()">‹ Anterior</button>
+    <span class="agenda-week-label" id="agendaWeekLabel">—</span>
+    <button class="agenda-nav-btn" onclick="agendaNextWeek()">Próxima ›</button>
+    <button class="agenda-nav-btn today" onclick="agendaToday()">Hoje</button>
+  </div>
+  <div class="agenda-grid" id="agendaGrid"></div>
+  <div class="agenda-semdia-block">
+    <div class="agenda-semdia-hdr">📌 Sem dia definido nesta semana</div>
+    <div class="agenda-semdia-cards" id="agendaSemDia"></div>
+    <button class="agenda-add-btn" style="margin-top:8px;max-width:220px" onclick="openAgendaModalSemDia()">+ Agendar sem dia definido</button>
+  </div>
+</div>
+
 <button class="fab" id="fab" onclick="openDrawer(null)">+ Novo Cliente</button>
+<button class="fab" id="fabAgenda" style="display:none" onclick="openAgendaModal(null)">+ Agendar Visita</button>
+
+<div class="overlay" id="agendaOverlay">
+  <div class="modal agenda-modal">
+    <div class="modal-title" id="agendaModalTitle">Agendar Visita</div>
+    <div id="agendaModalBody"></div>
+    <div class="btn-row" style="margin-top:18px">
+      <button class="btn-s" onclick="closeAgendaModal()">Cancelar</button>
+      <button class="btn-p" onclick="saveAgendaEntry()">Salvar</button>
+    </div>
+  </div>
+</div>
 
 <!-- Prio quick popup -->
 <div class="prio-popup" id="prioPopup">
@@ -798,7 +905,7 @@ let CFG = {
 };
 
 let ALL=[], FILTERED=[], HEADERS=[], COL={};
-let fFunil='todos', fPrio='todos', fRep='todos', fCity='';
+let fFunil='todos', fPrio='todos', fRep='todos', fCity='', fMarca='todos';
 let searchQ='', editRow=null, prioTargetRow=null;
 
 // ── API ───────────────────────────────────────────────────────────────────────
@@ -892,14 +999,27 @@ function freqPillHtml(fi){
 
 // ── Tabs ──────────────────────────────────────────────────────────────────────
 let currentTab='clientes';
+let AGENDA_LOADED=false;
 function switchTab(tab){
   currentTab=tab;
   document.getElementById('tabBtnClientes').classList.toggle('active',tab==='clientes');
   document.getElementById('tabBtnClassif').classList.toggle('active',tab==='classif');
+  document.getElementById('tabBtnAgenda').classList.toggle('active',tab==='agenda');
   document.getElementById('pageClientes').classList.toggle('active',tab==='clientes');
   document.getElementById('pageClassif').classList.toggle('active',tab==='classif');
+  document.getElementById('pageAgenda').classList.toggle('active',tab==='agenda');
   document.getElementById('fab').style.display=(tab==='clientes')?'flex':'none';
+  document.getElementById('fabAgenda').style.display=(tab==='agenda')?'flex':'none';
   if(tab==='classif') renderClassifTab();
+  if(tab==='agenda'){
+    if(!AGENDA_LOADED){ AGENDA_LOADED=true; loadAgendaData(); }
+    else renderAgendaTab();
+  }
+}
+// Rep. "W e J" conta como William e como James nos filtros
+function repMatches(rep,filter){
+  if(filter==='todos') return true;
+  return rep===filter || rep==='W e J';
 }
 
 // ── Aba Visitas (classificação + unificação de grupo) ────────────────────────
@@ -974,7 +1094,7 @@ function renderClassifTab(){
   }
   if(cFilterFreq!=='todos') list=list.filter(c=>classifGroup(c)===cFilterFreq);
   if(cFilterLink==='vinculados') list=list.filter(c=>isVinculado(c));
-  if(cFilterRep!=='todos') list=list.filter(c=>g(c._d,'Rep.')===cFilterRep);
+  if(cFilterRep!=='todos') list=list.filter(c=>repMatches(g(c._d,'Rep.'),cFilterRep));
 
   // Stats (sobre a base completa, não filtrada)
   const nAtrasado=ALL.filter(c=>classifGroup(c)==='atrasado').length;
@@ -1105,6 +1225,7 @@ async function setClassifForRow(sheetRow,val){
   const cl=ALL.find(c=>c._r===sheetRow); if(!cl) return;
   const idx=cv('Classificação');
   if(idx<0){showToast('Coluna "Classificação" não encontrada na planilha','err');return;}
+  const prevArr=[...cl._d];
   const rowArr=[...cl._d];
   while(rowArr.length<=idx) rowArr.push('');
   rowArr[idx]=val;
@@ -1112,7 +1233,7 @@ async function setClassifForRow(sheetRow,val){
     setSyncState('syncing','Salvando...');
     await sheetWrite('update',sheetRow,rowArr);
     cl._d=rowArr;
-    showToast(val?`Classificação: ${val}`:'Classificação removida','ok');
+    showUndoToast(val?`Classificação: ${val}`:'Classificação removida',sheetRow,prevArr);
     setSyncState('ok','Sincronizado');
     renderClassifTab();
   }catch(err){setSyncState('error','Erro');showToast(err.message,'err');}
@@ -1141,6 +1262,7 @@ function setFilter(type,val,el){
   if(type==='funil') fFunil=val;
   else if(type==='prio') fPrio=val;
   else if(type==='rep') fRep=val;
+  else if(type==='marca') fMarca=val;
   // deactivate siblings in same row
   el.closest('.filter-row').querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
   el.classList.add('active');
@@ -1159,7 +1281,10 @@ function applyFilters(){
   let list=[...ALL];
   if(fFunil!=='todos') list=list.filter(c=>g(c._d,'Funil')===fFunil);
   if(fPrio!=='todos')  list=list.filter(c=>g(c._d,'Prioridade')===fPrio);
-  if(fRep!=='todos')   list=list.filter(c=>g(c._d,'Rep.')===fRep);
+  if(fRep!=='todos')   list=list.filter(c=>repMatches(g(c._d,'Rep.'),fRep));
+  if(fMarca!=='todos'){
+    list=list.filter(c=>{const v=g(c._d,fMarca)||'Não';return v&&v!=='Não';});
+  }
   if(fCity) list=list.filter(c=>g(c._d,'Cidade').toLowerCase().includes(fCity));
   if(searchQ) list=list.filter(c=>{
     const hay=[c.name,g(c._d,'Cidade'),g(c._d,'CNPJ'),
@@ -1272,6 +1397,7 @@ async function quickVisit(e,sheetRow){
   const today=todayStr();
   const visitaIdx=cv('Última visita')>=0?cv('Última visita'):cv('Última Visita');
   if(visitaIdx<0){showToast('Coluna não encontrada','err');return;}
+  const prevArr=[...cl._d];
   const rowArr=[...cl._d];
   while(rowArr.length<=visitaIdx) rowArr.push('');
   rowArr[visitaIdx]=today;
@@ -1279,7 +1405,7 @@ async function quickVisit(e,sheetRow){
     setSyncState('syncing','Salvando...');
     await sheetWrite('update',sheetRow,rowArr);
     cl._d=rowArr;
-    showToast(`Visita: ${today}`,'ok');
+    showUndoToast(`Visita: ${today}`,sheetRow,prevArr);
     setSyncState('ok','Sincronizado');
     applyFilters(); renderClassifTab();
   }catch(err){setSyncState('error','Erro');showToast(err.message,'err');}
@@ -1310,6 +1436,7 @@ async function quickVisitDate(sheetRow,isoDate){
   const brDate=isoToBR(isoDate);
   const visitaIdx=cv('Última visita')>=0?cv('Última visita'):cv('Última Visita');
   if(visitaIdx<0){showToast('Coluna não encontrada','err');return;}
+  const prevArr=[...cl._d];
   const rowArr=[...cl._d];
   while(rowArr.length<=visitaIdx) rowArr.push('');
   rowArr[visitaIdx]=brDate;
@@ -1317,7 +1444,7 @@ async function quickVisitDate(sheetRow,isoDate){
     setSyncState('syncing','Salvando...');
     await sheetWrite('update',sheetRow,rowArr);
     cl._d=rowArr;
-    showToast(`Visita: ${brDate}`,'ok');
+    showUndoToast(`Visita: ${brDate}`,sheetRow,prevArr);
     setSyncState('ok','Sincronizado');
     applyFilters(); renderClassifTab();
   }catch(err){setSyncState('error','Erro');showToast(err.message,'err');}
@@ -1336,6 +1463,7 @@ async function setPrioQuick(val){
   document.getElementById('prioPopup').classList.remove('open');
   const cl=ALL.find(c=>c._r===prioTargetRow); if(!cl) return;
   const prioIdx=cv('Prioridade'); if(prioIdx<0) return;
+  const prevArr=[...cl._d];
   const rowArr=[...cl._d];
   while(rowArr.length<=prioIdx) rowArr.push('');
   rowArr[prioIdx]=val;
@@ -1343,7 +1471,7 @@ async function setPrioQuick(val){
     setSyncState('syncing','Salvando...');
     await sheetWrite('update',prioTargetRow,rowArr);
     cl._d=rowArr;
-    showToast(val?`Prioridade: ${val}`:'Prioridade removida','ok');
+    showUndoToast(val?`Prioridade: ${val}`:'Prioridade removida',prioTargetRow,prevArr);
     setSyncState('ok','Sincronizado');
     applyFilters(); renderStats(); renderClassifTab();
   }catch(err){setSyncState('error','Erro');showToast(err.message,'err');}
@@ -1432,9 +1560,9 @@ function openDrawer(sheetRow){
     <input type="hidden" id="fPrio" value="${curPrio}">`;
 
   const marcaBtns=MARCAS_CFG.map(m=>{
-    const val=isEdit?(get(m.key)||'Não'):'Não';
+    const val=isEdit?(get(m.key)||'Não'):'';
     return `<button class="marca-btn" data-marca="${m.key}" data-val="${val}" onclick="cycleMarca(this)">
-      <span class="mb-name">${m.label}</span><span class="mb-val">${val}</span>
+      <span class="mb-name">${m.label}</span><span class="mb-val">${val||'—'}</span>
     </button>`;
   }).join('');
 
@@ -1462,8 +1590,9 @@ function openDrawer(sheetRow){
       <div class="field"><label>Grupo / Rede</label><input id="fGrupo" value="${escH(get('Grupo/Rede'))}" placeholder="Ex: Luitex"></div>
       <div class="field"><label>Rep.</label>
         <select id="fRep">
-          <option ${get('Rep.')!=='James'?'selected':''}>William</option>
-          <option ${get('Rep.')==='James'?'selected':''}>James</option>
+          <option ${(!isEdit||get('Rep.')==='William'||!get('Rep.'))?'selected':''}>William</option>
+          <option ${isEdit&&get('Rep.')==='James'?'selected':''}>James</option>
+          <option ${isEdit&&get('Rep.')==='W e J'?'selected':''}>W e J</option>
         </select>
       </div>
     </div>
@@ -1500,7 +1629,7 @@ function openDrawer(sheetRow){
     </div>
     <div class="field-row">
       <div class="field"><label>Última Visita</label>
-        <input id="fVisita" type="date" value="${ult_vis_iso||today_iso}"
+        <input id="fVisita" type="date" value="${ult_vis_iso}"
           style="color-scheme:light">
       </div>
     </div>
@@ -1576,11 +1705,11 @@ async function saveClient(){
     'Prioridade':prioVal,
     'Última visita':visitaDate,'Última Visita':visitaDate,
     'Anotações':document.getElementById('fAnot').value.trim(),
-    'Rothenberger':marcaVals['Rothenberger']||'Não',
-    'Chiaperini':marcaVals['Chiaperini']||'Não',
-    'Techto':marcaVals['Techto']||'Não',
-    'Presto':marcaVals['Presto']||'Não',
-    'Horbach':marcaVals['Horbach']||'Não',
+    'Rothenberger':marcaVals['Rothenberger']||'',
+    'Chiaperini':marcaVals['Chiaperini']||'',
+    'Techto':marcaVals['Techto']||'',
+    'Presto':marcaVals['Presto']||'',
+    'Horbach':marcaVals['Horbach']||'',
     'CNPJ':document.getElementById('fCNPJ').value.trim(),
     'Código Rothenberger':document.getElementById('fCodR').value.trim(),
     'Cód. Rothenberger':document.getElementById('fCodR').value.trim(),
@@ -1645,11 +1774,260 @@ function showToast(msg,type=''){
   t.textContent=msg; t.className=`toast show ${type}`;
   clearTimeout(_tt); _tt=setTimeout(()=>t.classList.remove('show'),3200);
 }
+// ── Desfazer última ação ──────────────────────────────────────────────────────
+let lastUndo=null;
+function showUndoToast(msg,sheetRow,prevArr){
+  lastUndo={row:sheetRow,prevArr};
+  const t=document.getElementById('toast');
+  t.innerHTML=`<span>${escH(msg)}</span><button class="toast-undo" onclick="undoLast()">↩ Desfazer</button>`;
+  t.className='toast show ok has-undo';
+  clearTimeout(_tt); _tt=setTimeout(()=>{t.classList.remove('show');lastUndo=null;},6000);
+}
+async function undoLast(){
+  if(!lastUndo) return;
+  const {row,prevArr}=lastUndo; lastUndo=null;
+  const cl=ALL.find(c=>c._r===row); if(!cl) return;
+  document.getElementById('toast').classList.remove('show');
+  try{
+    setSyncState('syncing','Desfazendo...');
+    await sheetWrite('update',row,prevArr);
+    cl._d=[...prevArr];
+    setSyncState('ok','Sincronizado');
+    showToast('Ação desfeita ✓','ok');
+    applyFilters(); renderStats(); renderClassifTab();
+  }catch(err){setSyncState('error','Erro');showToast(err.message,'err');}
+}
 function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function todayStr(){const d=new Date();return`${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;}
 function todayISO(){const d=new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
 function isoToBR(iso){if(!iso)return'';const[y,m,day]=iso.split('-');return day&&m&&y?`${day}/${m}/${y}`:iso;}
 function brToISO(br){if(!br)return'';if(br.includes('-'))return br;const[day,m,y]=br.split('/');return y&&m&&day?`${y}-${m}-${day}`:''}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// AGENDA — visitas futuras organizadas por semana
+// Colunas na aba "Agenda": Cliente, ClienteRow, Semana, Dia, Periodo, Horario, Obs, Status
+// ═══════════════════════════════════════════════════════════════════════════
+let AGENDA=[];
+let agendaWeekOffset=0, editAgendaRow=null;
+
+function mondayOf(date){
+  const d=new Date(date); const day=d.getDay(); const diff=(day===0?-6:1-day);
+  d.setDate(d.getDate()+diff); d.setHours(0,0,0,0); return d;
+}
+function addDays(d,n){const r=new Date(d);r.setDate(r.getDate()+n);return r;}
+function isoDate(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function weekLabel(mondayIso){
+  const m=new Date(mondayIso+'T00:00:00'); const sun=addDays(m,6);
+  const fmt=d=>`${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`;
+  return `${fmt(m)} – ${fmt(sun)}`;
+}
+
+async function agendaRead(){
+  const url=`${API_BASE}/${CFG.id}/values/Agenda!A1:H2000?key=${CFG.key}`;
+  const r=await fetch(url);
+  if(!r.ok){const e=await r.json();throw new Error(e.error?.message||'Erro API (aba Agenda)');}
+  return r.json();
+}
+async function agendaWrite(action,row,values){
+  const r=await fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action,row,values})});
+  const txt=await r.text();
+  let j;try{j=JSON.parse(txt);}catch{throw new Error('Resposta inválida');}
+  if(j.status!=='ok') throw new Error(j.message||'Erro ao salvar');
+  return j;
+}
+async function agendaAppendRows(rows){
+  const r=await fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'agendaAppend',rows})});
+  const txt=await r.text();
+  let j;try{j=JSON.parse(txt);}catch{throw new Error('Resposta inválida');}
+  if(j.status!=='ok') throw new Error(j.message||'Erro ao salvar');
+  return j;
+}
+
+async function loadAgendaData(){
+  document.getElementById('agendaGrid').innerHTML=`<div class="loading"><div class="spinner"></div><p>Carregando agenda...</p></div>`;
+  try{
+    const data=await agendaRead();
+    const rows=data.values||[];
+    AGENDA=[];
+    for(let r=1;r<rows.length;r++){
+      const row=rows[r]||[];
+      if(!row[0]&&!row[2]&&!row[3]) continue;
+      AGENDA.push({
+        _r:r+1,
+        cliente:row[0]||'', clienteRow:row[1]||'', semana:row[2]||'',
+        dia:row[3]||'', periodo:row[4]||'', horario:row[5]||'', obs:row[6]||'', status:row[7]||'Pendente'
+      });
+    }
+    renderAgendaTab();
+  }catch(e){
+    document.getElementById('agendaGrid').innerHTML=`<div class="empty"><div class="ei">⚠️</div><p>${escH(e.message)}</p>
+      <button class="btn-p" style="max-width:180px;margin:12px auto 0" onclick="loadAgendaData()">Tentar novamente</button></div>`;
+  }
+}
+
+function renderAgendaTab(){
+  const baseMonday=mondayOf(new Date());
+  const monday=addDays(baseMonday, agendaWeekOffset*7);
+  const mondayIso=isoDate(monday);
+  document.getElementById('agendaWeekLabel').textContent=weekLabel(mondayIso);
+
+  const dayNames=['Segunda','Terça','Quarta','Quinta','Sexta','Sábado','Domingo'];
+  let cols='';
+  for(let i=0;i<7;i++){
+    const day=addDays(monday,i);
+    const dIso=isoDate(day);
+    const isWeekend=i>=5;
+    const entries=AGENDA.filter(a=>a.dia===dIso).sort((a,b)=>(a.horario||'99:99').localeCompare(b.horario||'99:99'));
+    cols+=`<div class="agenda-day-col ${isWeekend?'weekend':''}">
+      <div class="agenda-day-hdr"><span>${dayNames[i]}</span><span class="agenda-day-date">${String(day.getDate()).padStart(2,'0')}/${String(day.getMonth()+1).padStart(2,'0')}</span></div>
+      <div class="agenda-day-body">
+        ${entries.map(agendaCardHtml).join('')||'<div class="agenda-empty-day">—</div>'}
+        <button class="agenda-add-btn" onclick="openAgendaModal(null,'${mondayIso}','${dIso}')">+ Agendar</button>
+      </div>
+    </div>`;
+  }
+  document.getElementById('agendaGrid').innerHTML=cols;
+
+  const semDia=AGENDA.filter(a=>a.semana===mondayIso && !a.dia);
+  const semDiaEl=document.getElementById('agendaSemDia');
+  semDiaEl.innerHTML = semDia.length
+    ? semDia.map(agendaCardHtml).join('')
+    : '<div class="agenda-empty-day">Nenhuma visita sem dia definido nesta semana.</div>';
+  window._agendaCurrentMonday=mondayIso;
+}
+
+function agendaCardHtml(a){
+  const statusCls = a.status==='Realizada'?'ag-realizada':a.status==='Cancelada'?'ag-cancelada':'ag-pendente';
+  const meta=[a.periodo,a.horario].filter(Boolean).join(' · ');
+  return `<div class="agenda-card ${statusCls}">
+    <div class="ag-card-name">${escH(a.cliente)}</div>
+    ${meta?`<div class="ag-card-meta">${escH(meta)}</div>`:''}
+    ${a.obs?`<div class="ag-card-obs">${escH(a.obs)}</div>`:''}
+    <div class="ag-card-status">${a.status}</div>
+    <div class="ag-card-actions">
+      ${a.status==='Pendente'?`<button onclick="markRealizada(${a._r})" title="Marcar como realizada">✓</button>`:''}
+      ${a.status==='Pendente'?`<button onclick="cancelAgendaEntry(${a._r})" title="Cancelar">✕</button>`:''}
+      <button onclick="openAgendaModal(${a._r})" title="Editar">✏</button>
+      <button onclick="deleteAgendaEntry(${a._r})" title="Excluir">🗑</button>
+    </div>
+  </div>`;
+}
+
+function agendaPrevWeek(){agendaWeekOffset--;renderAgendaTab();}
+function agendaNextWeek(){agendaWeekOffset++;renderAgendaTab();}
+function agendaToday(){agendaWeekOffset=0;renderAgendaTab();}
+
+function openAgendaModalSemDia(){
+  openAgendaModal(null, window._agendaCurrentMonday||isoDate(mondayOf(new Date())), null);
+}
+
+function openAgendaModal(rowNumOrNull, presetWeek, presetDia){
+  editAgendaRow = (typeof rowNumOrNull==='number')?rowNumOrNull:null;
+  const entry = editAgendaRow ? AGENDA.find(a=>a._r===editAgendaRow) : null;
+  const semanaIso = entry ? entry.semana : (presetWeek || (window._agendaCurrentMonday||isoDate(mondayOf(new Date()))));
+  const diaIso = entry ? entry.dia : (presetDia||'');
+  document.getElementById('agendaModalTitle').textContent = editAgendaRow?'Editar Visita':'Agendar Visita';
+  document.getElementById('agendaModalBody').innerHTML = `
+    <label>Cliente</label>
+    <input id="agCliente" list="clienteDatalist" value="${escH(entry?entry.cliente:'')}" placeholder="Digite o nome do cliente">
+    <datalist id="clienteDatalist">${ALL.map(c=>`<option value="${escH(c.name)}">`).join('')}</datalist>
+    <label>Semana (qualquer dia dela — define a semana de referência)</label>
+    <input id="agSemana" type="date" value="${semanaIso}">
+    <label>Dia específico (opcional — deixe vazio se ainda não decidido)</label>
+    <input id="agDia" type="date" value="${diaIso}">
+    <label>Período (opcional)</label>
+    <select id="agPeriodo">
+      <option value="" ${!entry||!entry.periodo?'selected':''}>—</option>
+      <option value="Manhã" ${entry&&entry.periodo==='Manhã'?'selected':''}>Manhã</option>
+      <option value="Tarde" ${entry&&entry.periodo==='Tarde'?'selected':''}>Tarde</option>
+      <option value="Noite" ${entry&&entry.periodo==='Noite'?'selected':''}>Noite</option>
+    </select>
+    <label>Horário exato (opcional)</label>
+    <input id="agHorario" type="time" value="${entry?entry.horario:''}">
+    <label>Observação</label>
+    <input id="agObs" type="text" value="${escH(entry?entry.obs:'')}" placeholder="Ex: levar catálogo novo">`;
+  document.getElementById('agendaOverlay').classList.add('open');
+}
+function closeAgendaModal(){document.getElementById('agendaOverlay').classList.remove('open');editAgendaRow=null;}
+document.getElementById('agendaOverlay').addEventListener('click',function(e){if(e.target===this)closeAgendaModal();});
+
+async function saveAgendaEntry(){
+  const clienteName=document.getElementById('agCliente').value.trim();
+  if(!clienteName){showToast('Informe o cliente','err');return;}
+  const cliente=ALL.find(c=>c.name.toLowerCase()===clienteName.toLowerCase());
+  if(!cliente){showToast('Cliente não encontrado — escolha um da lista','err');return;}
+  const dia=document.getElementById('agDia').value||'';
+  const semanaInput=document.getElementById('agSemana').value||isoDate(mondayOf(new Date()));
+  const semana = dia ? isoDate(mondayOf(new Date(dia+'T00:00:00'))) : isoDate(mondayOf(new Date(semanaInput+'T00:00:00')));
+  const periodo=document.getElementById('agPeriodo').value||'';
+  const horario=document.getElementById('agHorario').value||'';
+  const obs=document.getElementById('agObs').value.trim();
+  const existing = editAgendaRow ? AGENDA.find(a=>a._r===editAgendaRow) : null;
+  const status = existing ? existing.status : 'Pendente';
+  const rowArr=[cliente.name, String(cliente._r), semana, dia, periodo, horario, obs, status];
+  try{
+    if(editAgendaRow){
+      await agendaWrite('agendaUpdate', editAgendaRow, rowArr);
+      if(existing){
+        existing.cliente=rowArr[0]; existing.clienteRow=rowArr[1]; existing.semana=rowArr[2];
+        existing.dia=rowArr[3]; existing.periodo=rowArr[4]; existing.horario=rowArr[5]; existing.obs=rowArr[6]; existing.status=rowArr[7];
+      }
+      showToast('Visita atualizada ✓','ok');
+      closeAgendaModal(); renderAgendaTab();
+    } else {
+      await agendaAppendRows([rowArr]);
+      showToast('Visita agendada ✓','ok');
+      closeAgendaModal();
+      await loadAgendaData();
+    }
+  }catch(err){showToast(err.message,'err');}
+}
+
+async function markRealizada(rowNum){
+  const a=AGENDA.find(x=>x._r===rowNum); if(!a) return;
+  const rowArr=[a.cliente,a.clienteRow,a.semana,a.dia,a.periodo,a.horario,a.obs,'Realizada'];
+  try{
+    setSyncState('syncing','Salvando...');
+    await agendaWrite('agendaUpdate',rowNum,rowArr);
+    a.status='Realizada';
+    const clienteRow=Number(a.clienteRow);
+    const cl=ALL.find(c=>c._r===clienteRow);
+    if(cl){
+      const visitaIdx=cv('Última visita')>=0?cv('Última visita'):cv('Última Visita');
+      if(visitaIdx>=0){
+        const dataVisita = a.dia ? isoToBR(a.dia) : todayStr();
+        const rowArrCl=[...cl._d];
+        while(rowArrCl.length<=visitaIdx) rowArrCl.push('');
+        rowArrCl[visitaIdx]=dataVisita;
+        await sheetWrite('update',clienteRow,rowArrCl);
+        cl._d=rowArrCl;
+      }
+    }
+    setSyncState('ok','Sincronizado');
+    showToast('Visita realizada — Última Visita do cliente atualizada ✓','ok');
+    renderAgendaTab(); applyFilters(); renderStats(); renderClassifTab();
+  }catch(err){setSyncState('error','Erro');showToast(err.message,'err');}
+}
+
+async function cancelAgendaEntry(rowNum){
+  const a=AGENDA.find(x=>x._r===rowNum); if(!a) return;
+  const rowArr=[a.cliente,a.clienteRow,a.semana,a.dia,a.periodo,a.horario,a.obs,'Cancelada'];
+  try{
+    await agendaWrite('agendaUpdate',rowNum,rowArr);
+    a.status='Cancelada';
+    showToast('Visita cancelada','ok');
+    renderAgendaTab();
+  }catch(err){showToast(err.message,'err');}
+}
+
+async function deleteAgendaEntry(rowNum){
+  if(!confirm('Excluir esta visita da agenda? Esta ação não pode ser desfeita.')) return;
+  try{
+    await agendaWrite('agendaDelete',rowNum,null);
+    showToast('Visita excluída','ok');
+    await loadAgendaData();
+  }catch(err){showToast(err.message,'err');}
+}
 
 loadData();
 </script>
