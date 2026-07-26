@@ -803,6 +803,12 @@ body { font-family: var(--font); background: var(--off); color: var(--text); min
 
 <!-- Agenda page -->
 <div class="main page" id="pageAgenda">
+  <div class="filter-row" style="justify-content:center;margin-bottom:10px">
+    <span class="filter-label">Agenda de</span>
+    <div class="chip active" id="agRepChipWilliam" onclick="setAgendaRep('William',this)">William</div>
+    <div class="chip" id="agRepChipJames" onclick="setAgendaRep('James',this)">James</div>
+    <div class="chip" id="agRepChipTodos" onclick="setAgendaRep('todos',this)">Todos</div>
+  </div>
   <div class="agenda-nav">
     <button class="agenda-nav-btn" onclick="agendaPrevWeek()">‹ Anterior</button>
     <span class="agenda-week-label" id="agendaWeekLabel">—</span>
@@ -1385,6 +1391,7 @@ function cardHtml(cl){
       <button class="card-btn visit" onclick="quickVisit(event,${r})">✓ Hoje</button>
       <button class="card-btn visit-alt" onclick="openVisitDatePicker(event,${r})" title="Registrar visita em outra data">📅</button>
       <button class="card-btn prio-btn" onclick="openPrioPopup(event,${r})">⚡ Prioridade</button>
+      <button class="card-btn" onclick="quickAddAgenda(event,${r})" title="Agendar visita na Agenda">🗓️ Agendar</button>
       <button class="card-btn" onclick="openDrawer(${r});event.stopPropagation()">✏ Editar</button>
     </div>
   </div>`;
@@ -1566,10 +1573,11 @@ function openDrawer(sheetRow){
     </button>`;
   }).join('');
 
-  const funilSel=FUNIL_OPTS.map(f=>{
-    const sel = isEdit ? get('Funil')===f : f==='Prospecção';
-    return `<option ${sel?'selected':''}>${f}</option>`;
-  }).join('');
+  const funilSel=`<option value="" ${!isEdit||!get('Funil')?'selected':''}>— Selecione —</option>` +
+    FUNIL_OPTS.map(f=>{
+      const sel = isEdit && get('Funil')===f;
+      return `<option ${sel?'selected':''}>${f}</option>`;
+    }).join('');
 
   const catSel=CAT_OPTS.map(o=>`<option ${(get('Categoria de negócio')||get('Categoria'))===o?'selected':''}>${o}</option>`).join('');
 
@@ -1617,6 +1625,21 @@ function openDrawer(sheetRow){
       <select id="fCat"><option value="">— Selecione —</option>${catSel}</select>
     </div>
 
+    <div class="dsec">Dados Comerciais</div>
+    <div class="field-row">
+      <div class="field"><label>CNPJ</label><input id="fCNPJ" value="${escH(get('CNPJ'))}"></div>
+      <div class="field"><label>Cód. Rothenberger</label><input id="fCodR" value="${escH(get('Cód. Rothenberger')||get('Código Rothenberger'))}"></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Política de Desconto</label><input id="fPol" value="${escH(get('Política de desconto')||get('Política Desconto'))}"></div>
+      <div class="field"><label>Telefone</label><input id="fTel" value="${escH(get('Telefone'))}"></div>
+    </div>
+    <div class="field"><label>Endereço</label><input id="fEnd" value="${escH(get('Endereço'))}"></div>
+
+    <div class="dsec">Portfólio de Marcas</div>
+    <div class="marca-grid">${marcaBtns}</div>
+    <p class="marca-hint">Toque para alternar: Sim → Potencial → Talvez → A.O.Rep → Fora Área → A.Cliente → Não</p>
+
     <div class="dsec">Status & Acompanhamento</div>
     <div class="field-row">
       <div class="field"><label>Funil</label><select id="fFunil">${funilSel}</select></div>
@@ -1636,22 +1659,7 @@ function openDrawer(sheetRow){
     <div class="field"><label>Prioridade</label>${prioSelHtml}</div>
     <div class="field"><label>Anotações</label>
       <textarea id="fAnot">${escH(get('Anotações'))}</textarea>
-    </div>
-
-    <div class="dsec">Portfólio de Marcas</div>
-    <div class="marca-grid">${marcaBtns}</div>
-    <p class="marca-hint">Toque para alternar: Sim → Potencial → Talvez → A.O.Rep → Fora Área → A.Cliente → Não</p>
-
-    <div class="dsec">Dados Comerciais</div>
-    <div class="field-row">
-      <div class="field"><label>CNPJ</label><input id="fCNPJ" value="${escH(get('CNPJ'))}"></div>
-      <div class="field"><label>Cód. Rothenberger</label><input id="fCodR" value="${escH(get('Cód. Rothenberger')||get('Código Rothenberger'))}"></div>
-    </div>
-    <div class="field-row">
-      <div class="field"><label>Política de Desconto</label><input id="fPol" value="${escH(get('Política de desconto')||get('Política Desconto'))}"></div>
-      <div class="field"><label>Telefone</label><input id="fTel" value="${escH(get('Telefone'))}"></div>
-    </div>
-    <div class="field"><label>Endereço</label><input id="fEnd" value="${escH(get('Endereço'))}"></div>`;
+    </div>`;
 
   document.getElementById('saveBtn').textContent=isEdit?'💾 Salvar':'+ Adicionar cliente';
 
@@ -1830,7 +1838,27 @@ function brToISO(br){if(!br)return'';if(br.includes('-'))return br;const[day,m,y
 // Colunas na aba "Agenda": Cliente, ClienteRow, Semana, Dia, Periodo, Horario, Obs, Status
 // ═══════════════════════════════════════════════════════════════════════════
 let AGENDA=[];
-let agendaWeekOffset=0, editAgendaRow=null;
+let agendaWeekOffset=0, editAgendaRow=null, agendaRepFilter='William';
+
+function setAgendaRep(rep,el){
+  agendaRepFilter=rep;
+  document.querySelectorAll('#pageAgenda .filter-row .chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  renderAgendaTab();
+}
+function agendaEntryMatchesRep(a){
+  if(agendaRepFilter==='todos') return true;
+  const cl=ALL.find(c=>c._r===Number(a.clienteRow));
+  const rep=cl?g(cl._d,'Rep.'):'';
+  return repMatches(rep, agendaRepFilter);
+}
+function quickAddAgenda(e,sheetRow){
+  e.stopPropagation();
+  const cl=ALL.find(c=>c._r===sheetRow); if(!cl) return;
+  openAgendaModal(null);
+  const inp=document.getElementById('agCliente');
+  if(inp) inp.value=cl.name;
+}
 
 function mondayOf(date){
   const d=new Date(date); const day=d.getDay(); const diff=(day===0?-6:1-day);
@@ -1903,7 +1931,7 @@ function renderAgendaTab(){
     const day=addDays(monday,i);
     const dIso=isoDate(day);
     const isWeekend=i>=5;
-    const entries=AGENDA.filter(a=>a.dia===dIso).sort((a,b)=>(a.horario||'99:99').localeCompare(b.horario||'99:99'));
+    const entries=AGENDA.filter(a=>a.dia===dIso && agendaEntryMatchesRep(a)).sort((a,b)=>(a.horario||'99:99').localeCompare(b.horario||'99:99'));
     cols+=`<div class="agenda-day-col ${isWeekend?'weekend':''}">
       <div class="agenda-day-hdr"><span>${dayNames[i]}</span><span class="agenda-day-date">${String(day.getDate()).padStart(2,'0')}/${String(day.getMonth()+1).padStart(2,'0')}</span></div>
       <div class="agenda-day-body">
@@ -1914,7 +1942,7 @@ function renderAgendaTab(){
   }
   document.getElementById('agendaGrid').innerHTML=cols;
 
-  const semDia=AGENDA.filter(a=>a.semana===mondayIso && !a.dia);
+  const semDia=AGENDA.filter(a=>a.semana===mondayIso && !a.dia && agendaEntryMatchesRep(a));
   const semDiaEl=document.getElementById('agendaSemDia');
   semDiaEl.innerHTML = semDia.length
     ? semDia.map(agendaCardHtml).join('')
