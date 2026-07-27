@@ -596,7 +596,15 @@ body { font-family: var(--font); background: var(--off); color: var(--text); min
   padding: 8px 9px; font-size: 12px; position: relative;
 }
 .agenda-card.ag-realizada { border-color: var(--green-bd); background: var(--green-lt); }
+.agenda-card.ag-naoatendeu { border-color: #f0c36d; background: #fff6e5; }
 .agenda-card.ag-cancelada { border-color: var(--border); background: var(--surface); opacity: .6; text-decoration: line-through; }
+.agenda-card { cursor: grab; }
+.agenda-card:active { cursor: grabbing; }
+.ag-ordem-badge {
+  position: absolute; top: -8px; left: -8px; background: var(--navy); color: #fff;
+  font-size: 10px; font-weight: 700; width: 20px; height: 20px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; box-shadow: var(--sh);
+}
 .ag-card-name { font-weight: 700; color: var(--navy); font-size: 12.5px; margin-bottom: 2px; }
 .ag-card-meta { font-size: 11px; color: var(--muted); margin-bottom: 2px; }
 .ag-card-obs { font-size: 11px; color: var(--text2); margin-bottom: 4px; font-style: italic; }
@@ -818,7 +826,7 @@ body { font-family: var(--font); background: var(--off); color: var(--text); min
   <div class="agenda-grid" id="agendaGrid"></div>
   <div class="agenda-semdia-block">
     <div class="agenda-semdia-hdr">📌 Sem dia definido nesta semana</div>
-    <div class="agenda-semdia-cards" id="agendaSemDia"></div>
+    <div class="agenda-semdia-cards" id="agendaSemDia" ondragover="agendaAllowDrop(event)" ondrop="agendaDropOnSemDia(event)"></div>
     <button class="agenda-add-btn" style="margin-top:8px;max-width:220px" onclick="openAgendaModalSemDia()">+ Agendar sem dia definido</button>
   </div>
 </div>
@@ -1848,6 +1856,8 @@ function setAgendaRep(rep,el){
 }
 function agendaEntryMatchesRep(a){
   if(agendaRepFilter==='todos') return true;
+  if(a.rep) return a.rep===agendaRepFilter;
+  // fallback para linhas antigas gravadas antes de existir a coluna "Rep"
   const cl=ALL.find(c=>c._r===Number(a.clienteRow));
   const rep=cl?g(cl._d,'Rep.'):'';
   return repMatches(rep, agendaRepFilter);
@@ -1873,7 +1883,7 @@ function weekLabel(mondayIso){
 }
 
 async function agendaRead(){
-  const url=`${API_BASE}/${CFG.id}/values/Agenda!A1:H2000?key=${CFG.key}`;
+  const url=`${API_BASE}/${CFG.id}/values/Agenda!A1:J2000?key=${CFG.key}`;
   const r=await fetch(url);
   if(!r.ok){const e=await r.json();throw new Error(e.error?.message||'Erro API (aba Agenda)');}
   return r.json();
@@ -1909,7 +1919,8 @@ async function loadAgendaData(){
       AGENDA.push({
         _r:r+1,
         cliente:row[0]||'', clienteRow:row[1]||'', semana:row[2]||'',
-        dia:row[3]||'', periodo:row[4]||'', horario:row[5]||'', obs:row[6]||'', status:row[7]||'Pendente'
+        dia:row[3]||'', periodo:row[4]||'', horario:row[5]||'', obs:row[6]||'', status:row[7]||'Pendente',
+        rep:row[8]||'', ordem:row[9]||''
       });
     }
     renderAgendaTab();
@@ -1917,6 +1928,14 @@ async function loadAgendaData(){
     document.getElementById('agendaGrid').innerHTML=`<div class="empty"><div class="ei">⚠️</div><p>${escH(e.message)}</p>
       <button class="btn-p" style="max-width:180px;margin:12px auto 0" onclick="loadAgendaData()">Tentar novamente</button></div>`;
   }
+}
+
+function agendaSortDay(entries){
+  return entries.slice().sort((a,b)=>{
+    const oa=a.ordem?Number(a.ordem):9999, ob=b.ordem?Number(b.ordem):9999;
+    if(oa!==ob) return oa-ob;
+    return (a.horario||'99:99').localeCompare(b.horario||'99:99');
+  });
 }
 
 function renderAgendaTab(){
@@ -1931,11 +1950,11 @@ function renderAgendaTab(){
     const day=addDays(monday,i);
     const dIso=isoDate(day);
     const isWeekend=i>=5;
-    const entries=AGENDA.filter(a=>a.dia===dIso && agendaEntryMatchesRep(a)).sort((a,b)=>(a.horario||'99:99').localeCompare(b.horario||'99:99'));
+    const entries=agendaSortDay(AGENDA.filter(a=>a.dia===dIso && agendaEntryMatchesRep(a)));
     cols+=`<div class="agenda-day-col ${isWeekend?'weekend':''}">
       <div class="agenda-day-hdr"><span>${dayNames[i]}</span><span class="agenda-day-date">${String(day.getDate()).padStart(2,'0')}/${String(day.getMonth()+1).padStart(2,'0')}</span></div>
-      <div class="agenda-day-body">
-        ${entries.map(agendaCardHtml).join('')||'<div class="agenda-empty-day">—</div>'}
+      <div class="agenda-day-body" ondragover="agendaAllowDrop(event)" ondrop="agendaDropOnDay(event,'${dIso}')">
+        ${entries.map(a=>agendaCardHtml(a,dIso)).join('')||'<div class="agenda-empty-day">—</div>'}
         <button class="agenda-add-btn" onclick="openAgendaModal(null,'${mondayIso}','${dIso}')">+ Agendar</button>
       </div>
     </div>`;
@@ -1945,26 +1964,94 @@ function renderAgendaTab(){
   const semDia=AGENDA.filter(a=>a.semana===mondayIso && !a.dia && agendaEntryMatchesRep(a));
   const semDiaEl=document.getElementById('agendaSemDia');
   semDiaEl.innerHTML = semDia.length
-    ? semDia.map(agendaCardHtml).join('')
-    : '<div class="agenda-empty-day">Nenhuma visita sem dia definido nesta semana.</div>';
+    ? semDia.map(a=>agendaCardHtml(a,null)).join('')
+    : '<div class="agenda-empty-day">Nenhuma visita sem dia definido nesta semana. Arraste um card aqui, ou de um dia da semana para aqui.</div>';
   window._agendaCurrentMonday=mondayIso;
 }
 
-function agendaCardHtml(a){
-  const statusCls = a.status==='Realizada'?'ag-realizada':a.status==='Cancelada'?'ag-cancelada':'ag-pendente';
+function agendaCardHtml(a,dIso){
+  const statusCls = a.status==='Realizada'?'ag-realizada':a.status==='Cancelada'?'ag-cancelada':a.status==='Não atendeu'?'ag-naoatendeu':'ag-pendente';
   const meta=[a.periodo,a.horario].filter(Boolean).join(' · ');
-  return `<div class="agenda-card ${statusCls}">
+  const ordemBadge = (dIso && a.ordem) ? `<span class="ag-ordem-badge">${a.ordem}º</span>` : '';
+  const dragAttrs = `draggable="true" ondragstart="agendaDragStart(event,${a._r})"`;
+  const dropOnCardAttrs = dIso ? `ondragover="agendaAllowDrop(event)" ondrop="agendaDropOnCard(event,'${dIso}',${a._r})"` : '';
+  return `<div class="agenda-card ${statusCls}" ${dragAttrs} ${dropOnCardAttrs}>
+    ${ordemBadge}
     <div class="ag-card-name">${escH(a.cliente)}</div>
     ${meta?`<div class="ag-card-meta">${escH(meta)}</div>`:''}
     ${a.obs?`<div class="ag-card-obs">${escH(a.obs)}</div>`:''}
-    <div class="ag-card-status">${a.status}</div>
+    <div class="ag-card-status">${a.status}${a.rep?` · ${a.rep}`:''}</div>
     <div class="ag-card-actions">
-      ${a.status==='Pendente'?`<button onclick="markRealizada(${a._r})" title="Marcar como realizada">✓</button>`:''}
-      ${a.status==='Pendente'?`<button onclick="cancelAgendaEntry(${a._r})" title="Cancelar">✕</button>`:''}
+      ${a.status==='Pendente'?`<button onclick="markStatus(${a._r},'Realizada')" title="Visitado com sucesso">✓</button>`:''}
+      ${a.status==='Pendente'?`<button onclick="markStatus(${a._r},'Não atendeu')" title="Não atendeu / não deu certo">⚠</button>`:''}
+      ${a.status==='Pendente'?`<button onclick="markStatus(${a._r},'Cancelada')" title="Cancelar">✕</button>`:''}
+      ${(dIso&&a.ordem)?`<button onclick="agendaClearOrder(${a._r})" title="Remover da ordem">🔓</button>`:''}
       <button onclick="openAgendaModal(${a._r})" title="Editar">✏</button>
       <button onclick="deleteAgendaEntry(${a._r})" title="Excluir">🗑</button>
     </div>
   </div>`;
+}
+
+// ── Drag & drop ──────────────────────────────────────────────────────────
+let agendaDragRow=null;
+function agendaDragStart(e,row){
+  agendaDragRow=row;
+  e.dataTransfer.setData('text/plain', String(row));
+  e.dataTransfer.effectAllowed='move';
+}
+function agendaAllowDrop(e){ e.preventDefault(); e.dataTransfer.dropEffect='move'; }
+
+async function agendaDropOnDay(e, dIso){
+  e.preventDefault(); e.stopPropagation();
+  const rowNum = agendaDragRow || Number(e.dataTransfer.getData('text/plain'));
+  await agendaMoveToDay(rowNum, dIso, null);
+}
+async function agendaDropOnCard(e, dIso, targetRow){
+  e.preventDefault(); e.stopPropagation();
+  const rowNum = agendaDragRow || Number(e.dataTransfer.getData('text/plain'));
+  if(rowNum===targetRow) return;
+  await agendaMoveToDay(rowNum, dIso, targetRow);
+}
+async function agendaDropOnSemDia(e){
+  e.preventDefault(); e.stopPropagation();
+  const rowNum = agendaDragRow || Number(e.dataTransfer.getData('text/plain'));
+  const a=AGENDA.find(x=>x._r===rowNum); if(!a) return;
+  a.dia=''; a.ordem='';
+  try{ await agendaPersistEntry(a); renderAgendaTab(); }
+  catch(err){ showToast(err.message,'err'); loadAgendaData(); }
+}
+async function agendaMoveToDay(rowNum, dIso, targetRow){
+  const a=AGENDA.find(x=>x._r===rowNum); if(!a) return;
+  a.dia=dIso;
+  a.semana=isoDate(mondayOf(new Date(dIso+'T00:00:00')));
+  let dayEntries=agendaSortDay(AGENDA.filter(x=>x.dia===dIso && x._r!==rowNum && agendaEntryMatchesRep(x)));
+  let insertAt=dayEntries.length;
+  if(targetRow){
+    const idx=dayEntries.findIndex(x=>x._r===targetRow);
+    if(idx>=0) insertAt=idx;
+  }
+  dayEntries.splice(insertAt,0,a);
+  const updates=[];
+  dayEntries.forEach((x,i)=>{
+    const newOrdem=String(i+1);
+    if(x.ordem!==newOrdem){ x.ordem=newOrdem; updates.push(x); }
+  });
+  if(!updates.includes(a)) updates.push(a);
+  try{
+    setSyncState('syncing','Salvando...');
+    for(const x of updates){ await agendaPersistEntry(x); }
+    setSyncState('ok','Sincronizado');
+    renderAgendaTab();
+  }catch(err){ setSyncState('error','Erro'); showToast(err.message,'err'); loadAgendaData(); }
+}
+async function agendaPersistEntry(a){
+  const rowArr=[a.cliente,a.clienteRow,a.semana,a.dia,a.periodo,a.horario,a.obs,a.status,a.rep,a.ordem];
+  await agendaWrite('agendaUpdate', a._r, rowArr);
+}
+function agendaClearOrder(rowNum){
+  const a=AGENDA.find(x=>x._r===rowNum); if(!a) return;
+  a.ordem='';
+  agendaPersistEntry(a).then(()=>renderAgendaTab()).catch(err=>showToast(err.message,'err'));
 }
 
 function agendaPrevWeek(){agendaWeekOffset--;renderAgendaTab();}
@@ -1980,11 +2067,17 @@ function openAgendaModal(rowNumOrNull, presetWeek, presetDia){
   const entry = editAgendaRow ? AGENDA.find(a=>a._r===editAgendaRow) : null;
   const semanaIso = entry ? entry.semana : (presetWeek || (window._agendaCurrentMonday||isoDate(mondayOf(new Date()))));
   const diaIso = entry ? entry.dia : (presetDia||'');
+  const repVal = entry ? (entry.rep||'William') : (agendaRepFilter==='todos'?'William':agendaRepFilter);
   document.getElementById('agendaModalTitle').textContent = editAgendaRow?'Editar Visita':'Agendar Visita';
   document.getElementById('agendaModalBody').innerHTML = `
     <label>Cliente</label>
     <input id="agCliente" list="clienteDatalist" value="${escH(entry?entry.cliente:'')}" placeholder="Digite o nome do cliente">
     <datalist id="clienteDatalist">${ALL.map(c=>`<option value="${escH(c.name)}">`).join('')}</datalist>
+    <label>Agenda de</label>
+    <select id="agRep">
+      <option value="William" ${repVal==='William'?'selected':''}>William</option>
+      <option value="James" ${repVal==='James'?'selected':''}>James</option>
+    </select>
     <label>Semana (qualquer dia dela — define a semana de referência)</label>
     <input id="agSemana" type="date" value="${semanaIso}">
     <label>Dia específico (opcional — deixe vazio se ainda não decidido)</label>
@@ -2005,7 +2098,9 @@ function openAgendaModal(rowNumOrNull, presetWeek, presetDia){
 function closeAgendaModal(){document.getElementById('agendaOverlay').classList.remove('open');editAgendaRow=null;}
 document.getElementById('agendaOverlay').addEventListener('click',function(e){if(e.target===this)closeAgendaModal();});
 
+let agendaSaving=false;
 async function saveAgendaEntry(){
+  if(agendaSaving) return;
   const clienteName=document.getElementById('agCliente').value.trim();
   if(!clienteName){showToast('Informe o cliente','err');return;}
   const cliente=ALL.find(c=>c.name.toLowerCase()===clienteName.toLowerCase());
@@ -2016,15 +2111,22 @@ async function saveAgendaEntry(){
   const periodo=document.getElementById('agPeriodo').value||'';
   const horario=document.getElementById('agHorario').value||'';
   const obs=document.getElementById('agObs').value.trim();
+  const rep=document.getElementById('agRep').value||'William';
   const existing = editAgendaRow ? AGENDA.find(a=>a._r===editAgendaRow) : null;
   const status = existing ? existing.status : 'Pendente';
-  const rowArr=[cliente.name, String(cliente._r), semana, dia, periodo, horario, obs, status];
+  const ordem = existing ? existing.ordem : '';
+  const rowArr=[cliente.name, String(cliente._r), semana, dia, periodo, horario, obs, status, rep, ordem];
+
+  agendaSaving=true;
+  const saveBtn=document.querySelector('#agendaOverlay .btn-p');
+  if(saveBtn){saveBtn.disabled=true; saveBtn.textContent='Salvando...';}
   try{
     if(editAgendaRow){
       await agendaWrite('agendaUpdate', editAgendaRow, rowArr);
       if(existing){
         existing.cliente=rowArr[0]; existing.clienteRow=rowArr[1]; existing.semana=rowArr[2];
-        existing.dia=rowArr[3]; existing.periodo=rowArr[4]; existing.horario=rowArr[5]; existing.obs=rowArr[6]; existing.status=rowArr[7];
+        existing.dia=rowArr[3]; existing.periodo=rowArr[4]; existing.horario=rowArr[5]; existing.obs=rowArr[6];
+        existing.status=rowArr[7]; existing.rep=rowArr[8]; existing.ordem=rowArr[9];
       }
       showToast('Visita atualizada ✓','ok');
       closeAgendaModal(); renderAgendaTab();
@@ -2034,44 +2136,43 @@ async function saveAgendaEntry(){
       closeAgendaModal();
       await loadAgendaData();
     }
-  }catch(err){showToast(err.message,'err');}
+  }catch(err){
+    showToast(err.message,'err');
+  }finally{
+    agendaSaving=false;
+    if(saveBtn){saveBtn.disabled=false; saveBtn.textContent='Salvar';}
+  }
 }
 
-async function markRealizada(rowNum){
+async function markStatus(rowNum, status){
   const a=AGENDA.find(x=>x._r===rowNum); if(!a) return;
-  const rowArr=[a.cliente,a.clienteRow,a.semana,a.dia,a.periodo,a.horario,a.obs,'Realizada'];
+  const rowArr=[a.cliente,a.clienteRow,a.semana,a.dia,a.periodo,a.horario,a.obs,status,a.rep,a.ordem];
   try{
     setSyncState('syncing','Salvando...');
     await agendaWrite('agendaUpdate',rowNum,rowArr);
-    a.status='Realizada';
-    const clienteRow=Number(a.clienteRow);
-    const cl=ALL.find(c=>c._r===clienteRow);
-    if(cl){
-      const visitaIdx=cv('Última visita')>=0?cv('Última visita'):cv('Última Visita');
-      if(visitaIdx>=0){
-        const dataVisita = a.dia ? isoToBR(a.dia) : todayStr();
-        const rowArrCl=[...cl._d];
-        while(rowArrCl.length<=visitaIdx) rowArrCl.push('');
-        rowArrCl[visitaIdx]=dataVisita;
-        await sheetWriteWithTimeout('update',clienteRow,rowArrCl);
-        cl._d=rowArrCl;
+    a.status=status;
+    if(status==='Realizada'){
+      const clienteRow=Number(a.clienteRow);
+      const cl=ALL.find(c=>c._r===clienteRow);
+      if(cl){
+        const visitaIdx=cv('Última visita')>=0?cv('Última visita'):cv('Última Visita');
+        if(visitaIdx>=0){
+          const dataVisita = a.dia ? isoToBR(a.dia) : todayStr();
+          const rowArrCl=[...cl._d];
+          while(rowArrCl.length<=visitaIdx) rowArrCl.push('');
+          rowArrCl[visitaIdx]=dataVisita;
+          await sheetWriteWithTimeout('update',clienteRow,rowArrCl);
+          cl._d=rowArrCl;
+        }
       }
     }
     setSyncState('ok','Sincronizado');
-    showToast('Visita realizada — Última Visita do cliente atualizada ✓','ok');
+    const msg = status==='Realizada' ? 'Visita realizada — Última Visita do cliente atualizada ✓'
+      : status==='Não atendeu' ? 'Marcado como "Não atendeu" ✓'
+      : 'Visita cancelada';
+    showToast(msg,'ok');
     renderAgendaTab(); applyFilters(); renderStats(); renderClassifTab();
   }catch(err){setSyncState('error','Erro');showToast(err.message,'err');}
-}
-
-async function cancelAgendaEntry(rowNum){
-  const a=AGENDA.find(x=>x._r===rowNum); if(!a) return;
-  const rowArr=[a.cliente,a.clienteRow,a.semana,a.dia,a.periodo,a.horario,a.obs,'Cancelada'];
-  try{
-    await agendaWrite('agendaUpdate',rowNum,rowArr);
-    a.status='Cancelada';
-    showToast('Visita cancelada','ok');
-    renderAgendaTab();
-  }catch(err){showToast(err.message,'err');}
 }
 
 async function deleteAgendaEntry(rowNum){
