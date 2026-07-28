@@ -561,67 +561,112 @@ body { font-family: var(--font); background: var(--off); color: var(--text); min
 .ficha-fact { background: var(--surface); border-radius: var(--r); padding: 10px 12px; border: 1px solid var(--border); }
 
 /* ── Agenda tab ── */
-.agenda-nav { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 14px; }
+.icn { display: inline-flex; align-items: center; justify-content: center; line-height: 0; }
+.icn svg { width: 15px; height: 15px; display: block; }
+.agenda-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 16px; flex-wrap: wrap; }
+.agenda-rep-switch { display: flex; background: var(--surface); border-radius: 999px; padding: 3px; gap: 2px; border: 1px solid var(--border); }
+.agrep-btn {
+  border: none; background: transparent; padding: 8px 16px; border-radius: 999px;
+  font-size: 13px; font-weight: 600; color: var(--muted); cursor: pointer; font-family: var(--font);
+  transition: background .15s, color .15s;
+}
+.agrep-btn.active { background: var(--navy); color: #fff; }
+.agrep-btn:not(.active):hover { color: var(--navy); }
+.agenda-nav { display: flex; align-items: center; gap: 10px; }
 .agenda-nav-btn {
-  background: var(--white); border: 1.5px solid var(--border); border-radius: var(--r);
-  padding: 7px 12px; font-size: 13px; font-weight: 600; color: var(--navy); cursor: pointer;
-  box-shadow: var(--sh); font-family: var(--font);
+  background: var(--white); border: 1px solid var(--border); border-radius: 999px;
+  padding: 8px 14px; font-size: 13px; font-weight: 600; color: var(--navy); cursor: pointer;
+  box-shadow: var(--sh); font-family: var(--font); display: flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px;
 }
-.agenda-nav-btn:hover { border-color: var(--blue); color: var(--blue); }
+.agenda-nav-btn.today { width: auto; padding: 8px 16px; }
+.agenda-nav-btn:hover { border-color: var(--navy); color: var(--navy); background: var(--surface); }
 .agenda-nav-btn.today { background: var(--navy); color: #fff; border-color: var(--navy); }
-.agenda-week-label { font-size: 14px; font-weight: 700; color: var(--navy); min-width: 130px; text-align: center; }
-.agenda-grid { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; }
+.agenda-nav-btn.today:hover { opacity: .9; }
+.agenda-week-label { font-size: 15px; font-weight: 700; color: var(--navy); min-width: 140px; text-align: center; }
+
+.agenda-grid { display: flex; gap: 14px; overflow-x: auto; padding-bottom: 12px; scroll-snap-type: x proximity; }
 .agenda-day-col {
-  flex: 1 1 150px; min-width: 150px; background: var(--white);
-  border: 1.5px solid var(--border); border-radius: var(--r2); box-shadow: var(--sh);
-  display: flex; flex-direction: column; overflow: hidden;
+  flex: 1 1 300px; min-width: 300px; scroll-snap-align: start;
+  background: var(--white); border: 1px solid var(--border); border-radius: 18px;
+  box-shadow: var(--sh); display: flex; flex-direction: column; overflow: hidden;
 }
-.agenda-day-col.weekend { flex: 0 0 110px; min-width: 110px; background: var(--surface); }
+.agenda-day-col.weekend { flex: 0 0 230px; min-width: 230px; background: #fafbfc; }
+.agenda-day-col.is-today { border-color: var(--navy); box-shadow: 0 0 0 2px rgba(20,40,70,.08), var(--sh); }
 .agenda-day-hdr {
-  background: var(--navy2); color: #fff; font-size: 11px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: .5px; padding: 8px 10px;
-  display: flex; align-items: center; justify-content: space-between;
+  background: var(--navy2); color: #fff; padding: 14px 16px 12px;
+  display: flex; align-items: baseline; justify-content: space-between;
 }
-.agenda-day-date { font-size: 10px; font-weight: 600; color: rgba(255,255,255,.75); }
-.agenda-day-body { padding: 8px; display: flex; flex-direction: column; gap: 6px; min-height: 60px; }
-.agenda-empty-day { font-size: 11px; color: var(--muted2); text-align: center; padding: 10px 0; }
+.agenda-day-hdr .agd-name { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; }
+.agenda-day-hdr .agd-date { font-size: 12px; font-weight: 600; color: rgba(255,255,255,.7); }
+.agenda-day-note {
+  display: flex; align-items: center; gap: 7px; padding: 9px 14px;
+  background: var(--surface); border-bottom: 1px solid var(--border);
+}
+.agenda-day-note .icn { color: var(--muted); flex-shrink: 0; }
+.agenda-day-note input {
+  border: none; background: transparent; outline: none; font-size: 12.5px;
+  color: var(--text); font-family: var(--font); width: 100%; font-style: italic;
+}
+.agenda-day-note input::placeholder { color: var(--muted2); font-style: italic; }
+.agenda-day-body {
+  padding: 12px; display: flex; flex-direction: column; gap: 10px; min-height: 140px; flex: 1;
+  transition: background .12s;
+}
+.agenda-day-body.drag-over { background: var(--blue-lt); }
+.agenda-empty-day { font-size: 12px; color: var(--muted2); text-align: center; padding: 22px 8px; line-height: 1.5; }
 .agenda-add-btn {
-  background: var(--blue-lt); border: 1.5px dashed var(--sky); border-radius: var(--r);
-  color: var(--blue); font-size: 11px; font-weight: 700; padding: 7px; cursor: pointer;
-  font-family: var(--font); margin-top: 2px;
+  background: transparent; border: 1.5px dashed var(--border); border-radius: 12px;
+  color: var(--muted); font-size: 12.5px; font-weight: 600; padding: 10px; cursor: pointer;
+  font-family: var(--font); margin-top: 2px; display: flex; align-items: center; justify-content: center; gap: 6px;
 }
-.agenda-add-btn:hover { background: var(--sky); }
+.agenda-add-btn:hover { background: var(--blue-lt); border-color: var(--sky); color: var(--blue); }
+
+.agenda-group {
+  border: 1.5px dashed var(--sky); border-radius: 14px; padding: 8px; background: rgba(224,238,255,.35);
+  display: flex; flex-direction: column; gap: 8px;
+}
+.agenda-group-hdr {
+  display: flex; align-items: center; gap: 6px; font-size: 10.5px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .5px; color: var(--blue); padding: 2px 4px 0; cursor: grab;
+}
+.agenda-group-hdr:active { cursor: grabbing; }
+.agenda-group-hdr .icn { color: var(--blue); }
+
 .agenda-card {
-  background: var(--off); border: 1.5px solid var(--border); border-radius: var(--r);
-  padding: 8px 9px; font-size: 12px; position: relative;
+  background: var(--white); border: 1px solid var(--border); border-left: 4px solid var(--sky);
+  border-radius: 12px; padding: 12px 13px; font-size: 12.5px; position: relative;
+  cursor: grab; box-shadow: 0 1px 2px rgba(20,30,50,.05); transition: box-shadow .12s, transform .12s;
 }
-.agenda-card.ag-realizada { border-color: var(--green-bd); background: var(--green-lt); }
-.agenda-card.ag-naoatendeu { border-color: #f0c36d; background: #fff6e5; }
-.agenda-card.ag-cancelada { border-color: var(--border); background: var(--surface); opacity: .6; text-decoration: line-through; }
-.agenda-card { cursor: grab; }
+.agenda-card:hover { box-shadow: 0 3px 10px rgba(20,30,50,.09); }
 .agenda-card:active { cursor: grabbing; }
-.ag-ordem-badge {
-  position: absolute; top: -8px; left: -8px; background: var(--navy); color: #fff;
-  font-size: 10px; font-weight: 700; width: 20px; height: 20px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center; box-shadow: var(--sh);
-}
-.ag-card-name { font-weight: 700; color: var(--navy); font-size: 12.5px; margin-bottom: 2px; }
-.ag-card-meta { font-size: 11px; color: var(--muted); margin-bottom: 2px; }
-.ag-card-obs { font-size: 11px; color: var(--text2); margin-bottom: 4px; font-style: italic; }
-.ag-card-status { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; color: var(--muted2); margin-bottom: 4px; }
-.ag-card-actions { display: flex; gap: 4px; }
+.agenda-card.drag-over { outline: 2px solid var(--blue); outline-offset: 2px; }
+.agenda-card.ag-pendente { border-left-color: var(--sky); }
+.agenda-card.ag-realizada { border-left-color: #4caf7d; background: var(--green-lt); }
+.agenda-card.ag-naoatendeu { border-left-color: #e3a53f; background: #fff8ec; }
+.agenda-card.ag-cancelada { border-left-color: var(--border); background: var(--surface); opacity: .55; text-decoration: line-through; }
+.ag-card-name { font-weight: 700; color: var(--navy); font-size: 13.5px; margin-bottom: 3px; }
+.ag-card-meta { font-size: 11.5px; color: var(--muted); margin-bottom: 3px; }
+.ag-card-obs { font-size: 11.5px; color: var(--text2); margin-bottom: 6px; font-style: italic; }
+.ag-card-status { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; color: var(--muted2); margin-bottom: 8px; }
+.ag-card-actions { display: flex; gap: 6px; }
 .ag-card-actions button {
-  border: none; background: var(--white); border: 1px solid var(--border); border-radius: 6px;
-  width: 22px; height: 22px; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  border: 1px solid var(--border); background: var(--white); border-radius: 8px;
+  width: 28px; height: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  color: var(--muted); transition: border-color .12s, color .12s;
 }
-.ag-card-actions button:hover { border-color: var(--blue); }
+.ag-card-actions button:hover { border-color: var(--navy); color: var(--navy); }
+.ag-card-actions button.act-done:hover { border-color: #4caf7d; color: #4caf7d; }
+.ag-card-actions button.act-warn:hover { border-color: #e3a53f; color: #e3a53f; }
+.ag-card-actions button.act-danger:hover { border-color: #d16060; color: #d16060; }
+
 .agenda-semdia-block {
-  background: var(--white); border: 1.5px solid var(--border); border-radius: var(--r2);
-  box-shadow: var(--sh); padding: 12px; margin-top: 14px;
+  background: var(--white); border: 1px solid var(--border); border-radius: 18px;
+  box-shadow: var(--sh); padding: 16px; margin-top: 16px;
 }
-.agenda-semdia-hdr { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); margin-bottom: 8px; }
-.agenda-semdia-cards { display: flex; flex-wrap: wrap; gap: 8px; }
-.agenda-semdia-cards .agenda-card { flex: 1 1 220px; max-width: 280px; }
+.agenda-semdia-hdr { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); margin-bottom: 10px; }
+.agenda-semdia-cards { display: flex; flex-wrap: wrap; gap: 10px; min-height: 40px; }
+.agenda-semdia-cards .agenda-card, .agenda-semdia-cards .agenda-group { flex: 1 1 240px; max-width: 300px; }
 .agenda-modal label { display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); margin-bottom: 5px; margin-top: 12px; }
 .agenda-modal label:first-child { margin-top: 0; }
 .agenda-modal input, .agenda-modal select {
@@ -811,23 +856,24 @@ body { font-family: var(--font); background: var(--off); color: var(--text); min
 
 <!-- Agenda page -->
 <div class="main page" id="pageAgenda">
-  <div class="filter-row" style="justify-content:center;margin-bottom:10px">
-    <span class="filter-label">Agenda de</span>
-    <div class="chip active" id="agRepChipWilliam" onclick="setAgendaRep('William',this)">William</div>
-    <div class="chip" id="agRepChipJames" onclick="setAgendaRep('James',this)">James</div>
-    <div class="chip" id="agRepChipTodos" onclick="setAgendaRep('todos',this)">Todos</div>
-  </div>
-  <div class="agenda-nav">
-    <button class="agenda-nav-btn" onclick="agendaPrevWeek()">‹ Anterior</button>
-    <span class="agenda-week-label" id="agendaWeekLabel">—</span>
-    <button class="agenda-nav-btn" onclick="agendaNextWeek()">Próxima ›</button>
-    <button class="agenda-nav-btn today" onclick="agendaToday()">Hoje</button>
+  <div class="agenda-toolbar">
+    <div class="agenda-rep-switch">
+      <button class="agrep-btn active" id="agRepChipWilliam" onclick="setAgendaRep('William',this)">William</button>
+      <button class="agrep-btn" id="agRepChipJames" onclick="setAgendaRep('James',this)">James</button>
+      <button class="agrep-btn" id="agRepChipTodos" onclick="setAgendaRep('todos',this)">Todos</button>
+    </div>
+    <div class="agenda-nav">
+      <button class="agenda-nav-btn" onclick="agendaPrevWeek()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <span class="agenda-week-label" id="agendaWeekLabel">—</span>
+      <button class="agenda-nav-btn" onclick="agendaNextWeek()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg></button>
+      <button class="agenda-nav-btn today" onclick="agendaToday()">Hoje</button>
+    </div>
   </div>
   <div class="agenda-grid" id="agendaGrid"></div>
   <div class="agenda-semdia-block">
-    <div class="agenda-semdia-hdr">📌 Sem dia definido nesta semana</div>
+    <div class="agenda-semdia-hdr">Sem dia definido nesta semana</div>
     <div class="agenda-semdia-cards" id="agendaSemDia" ondragover="agendaAllowDrop(event)" ondrop="agendaDropOnSemDia(event)"></div>
-    <button class="agenda-add-btn" style="margin-top:8px;max-width:220px" onclick="openAgendaModalSemDia()">+ Agendar sem dia definido</button>
+    <button class="agenda-add-btn" onclick="openAgendaModalSemDia()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span>Agendar sem dia definido</span></button>
   </div>
 </div>
 
@@ -1399,7 +1445,7 @@ function cardHtml(cl){
       <button class="card-btn visit" onclick="quickVisit(event,${r})">✓ Hoje</button>
       <button class="card-btn visit-alt" onclick="openVisitDatePicker(event,${r})" title="Registrar visita em outra data">📅</button>
       <button class="card-btn prio-btn" onclick="openPrioPopup(event,${r})">⚡ Prioridade</button>
-      <button class="card-btn" onclick="quickAddAgenda(event,${r})" title="Agendar visita na Agenda">🗓️ Agendar</button>
+      <button class="card-btn" onclick="quickAddAgenda(event,${r})" title="Agendar visita na Agenda"><span class="icn" style="margin-right:5px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13" style="vertical-align:-2px"><rect x="3" y="4" width="18" height="18" rx="3"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>Agendar</button>
       <button class="card-btn" onclick="openDrawer(${r});event.stopPropagation()">✏ Editar</button>
     </div>
   </div>`;
@@ -1847,17 +1893,31 @@ function brToISO(br){if(!br)return'';if(br.includes('-'))return br;const[day,m,y
 // ═══════════════════════════════════════════════════════════════════════════
 let AGENDA=[];
 let agendaWeekOffset=0, editAgendaRow=null, agendaRepFilter='William';
+let agendaGroupSeq=200000;
+
+// ── Ícones (SVG inline, sem emoji) ──────────────────────────────────────
+const ICN = {
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+  alert:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+  x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+  edit:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>',
+  trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>',
+  grip:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="6" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="18" r="1"/><circle cx="15" cy="6" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="18" r="1"/></svg>',
+  pin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>',
+  route:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M10 19h4a4 4 0 0 0 4-4v-1a4 4 0 0 0-4-4H8a4 4 0 0 1-4-4"/></svg>',
+  calendar:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>'
+};
+function icn(name,extraCls){return `<span class="icn ${extraCls||''}">${ICN[name]||''}</span>`;}
 
 function setAgendaRep(rep,el){
   agendaRepFilter=rep;
-  document.querySelectorAll('#pageAgenda .filter-row .chip').forEach(c=>c.classList.remove('active'));
+  document.querySelectorAll('.agenda-rep-switch .agrep-btn').forEach(c=>c.classList.remove('active'));
   el.classList.add('active');
   renderAgendaTab();
 }
 function agendaEntryMatchesRep(a){
   if(agendaRepFilter==='todos') return true;
   if(a.rep) return a.rep===agendaRepFilter;
-  // fallback para linhas antigas gravadas antes de existir a coluna "Rep"
   const cl=ALL.find(c=>c._r===Number(a.clienteRow));
   const rep=cl?g(cl._d,'Rep.'):'';
   return repMatches(rep, agendaRepFilter);
@@ -1882,6 +1942,16 @@ function weekLabel(mondayIso){
   return `${fmt(m)} – ${fmt(sun)}`;
 }
 
+// ── Nota de cidade/região por dia (guardada localmente no navegador) ────
+function agendaDayNoteKey(dIso){return 'agendaDayNote_'+dIso;}
+function agendaGetDayNote(dIso){return localStorage.getItem(agendaDayNoteKey(dIso))||'';}
+function agendaSetDayNote(dIso,val){
+  val=(val||'').trim();
+  if(val) localStorage.setItem(agendaDayNoteKey(dIso),val);
+  else localStorage.removeItem(agendaDayNoteKey(dIso));
+}
+
+// ── Leitura/escrita na planilha ──────────────────────────────────────────
 async function agendaRead(){
   const url=`${API_BASE}/${CFG.id}/values/Agenda!A1:J2000?key=${CFG.key}`;
   const r=await fetch(url);
@@ -1905,6 +1975,19 @@ async function agendaAppendRows(rows){
     if(j.status!=='ok') throw new Error(j.message||'Erro ao salvar');
     return j;
   })(), 20000, 'salvar a agenda');
+}
+async function agendaPersistEntry(a){
+  const rowArr=[a.cliente,a.clienteRow,a.semana,a.dia,a.periodo,a.horario,a.obs,a.status,a.rep,a.ordem];
+  await agendaWrite('agendaUpdate', a._r, rowArr);
+}
+async function agendaPersistBatch(items){
+  try{
+    setSyncState('syncing','Salvando...');
+    for(const x of items){ await agendaPersistEntry(x); }
+    setSyncState('ok','Sincronizado');
+  }catch(err){
+    setSyncState('error','Erro'); showToast(err.message,'err'); loadAgendaData();
+  }
 }
 
 async function loadAgendaData(){
@@ -1930,18 +2013,33 @@ async function loadAgendaData(){
   }
 }
 
-function agendaSortDay(entries){
-  return entries.slice().sort((a,b)=>{
-    const oa=a.ordem?Number(a.ordem):9999, ob=b.ordem?Number(b.ordem):9999;
-    if(oa!==ob) return oa-ob;
-    return (a.horario||'99:99').localeCompare(b.horario||'99:99');
-  });
+// ── Modelo de agrupamento: "ordem" guarda "grupo-posicao" (ex: "3-1") ────
+function parseOrdem(a){
+  if(a.ordem && String(a.ordem).includes('-')){
+    const [gS,pS]=String(a.ordem).split('-');
+    const g=Number(gS), p=Number(pS);
+    if(!isNaN(g)&&!isNaN(p)) return {g,p};
+  }
+  return {g:100000+a._r, p:1};
 }
+function dayGroups(entries){
+  const map=new Map();
+  entries.forEach(a=>{
+    const {g,p}=parseOrdem(a);
+    if(!map.has(g)) map.set(g,[]);
+    map.get(g).push({a,p});
+  });
+  return Array.from(map.entries())
+    .map(([g,arr])=>({g, items:arr.sort((x,y)=>x.p-y.p).map(x=>x.a)}))
+    .sort((x,y)=>x.g-y.g);
+}
+function nextGroupId(){ return ++agendaGroupSeq; }
 
 function renderAgendaTab(){
   const baseMonday=mondayOf(new Date());
   const monday=addDays(baseMonday, agendaWeekOffset*7);
   const mondayIso=isoDate(monday);
+  const todayIso=isoDate(new Date());
   document.getElementById('agendaWeekLabel').textContent=weekLabel(mondayIso);
 
   const dayNames=['Segunda','Terça','Quarta','Quinta','Sexta','Sábado','Domingo'];
@@ -1950,108 +2048,168 @@ function renderAgendaTab(){
     const day=addDays(monday,i);
     const dIso=isoDate(day);
     const isWeekend=i>=5;
-    const entries=agendaSortDay(AGENDA.filter(a=>a.dia===dIso && agendaEntryMatchesRep(a)));
-    cols+=`<div class="agenda-day-col ${isWeekend?'weekend':''}">
-      <div class="agenda-day-hdr"><span>${dayNames[i]}</span><span class="agenda-day-date">${String(day.getDate()).padStart(2,'0')}/${String(day.getMonth()+1).padStart(2,'0')}</span></div>
-      <div class="agenda-day-body" ondragover="agendaAllowDrop(event)" ondrop="agendaDropOnDay(event,'${dIso}')">
-        ${entries.map(a=>agendaCardHtml(a,dIso)).join('')||'<div class="agenda-empty-day">—</div>'}
-        <button class="agenda-add-btn" onclick="openAgendaModal(null,'${mondayIso}','${dIso}')">+ Agendar</button>
+    const isToday=dIso===todayIso;
+    const entries=AGENDA.filter(a=>a.dia===dIso && agendaEntryMatchesRep(a));
+    const groups=dayGroups(entries);
+    const note=agendaGetDayNote(dIso);
+    cols+=`<div class="agenda-day-col ${isWeekend?'weekend':''} ${isToday?'is-today':''}">
+      <div class="agenda-day-hdr">
+        <span class="agd-name">${dayNames[i]}</span>
+        <span class="agd-date">${String(day.getDate()).padStart(2,'0')}/${String(day.getMonth()+1).padStart(2,'0')}</span>
+      </div>
+      <div class="agenda-day-note">
+        ${icn('pin')}
+        <input type="text" value="${escH(note)}" placeholder="Cidade / região do dia" onchange="agendaSetDayNote('${dIso}', this.value)">
+      </div>
+      <div class="agenda-day-body" ondragover="agendaAllowDrop(event)" ondrop="agendaDropOnDay(event,'${dIso}')" ondragenter="this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')">
+        ${groups.length ? groups.map(gr=>agendaGroupHtml(gr,dIso)).join('') : '<div class="agenda-empty-day">Nenhuma visita neste dia.<br>Arraste um cliente aqui.</div>'}
+        <button class="agenda-add-btn" onclick="openAgendaModal(null,'${mondayIso}','${dIso}')">${icn('calendar')}<span>Agendar</span></button>
       </div>
     </div>`;
   }
   document.getElementById('agendaGrid').innerHTML=cols;
 
-  const semDia=AGENDA.filter(a=>a.semana===mondayIso && !a.dia && agendaEntryMatchesRep(a));
+  const semDiaEntries=AGENDA.filter(a=>a.semana===mondayIso && !a.dia && agendaEntryMatchesRep(a));
+  const semDiaGroups=dayGroups(semDiaEntries);
   const semDiaEl=document.getElementById('agendaSemDia');
-  semDiaEl.innerHTML = semDia.length
-    ? semDia.map(a=>agendaCardHtml(a,null)).join('')
-    : '<div class="agenda-empty-day">Nenhuma visita sem dia definido nesta semana. Arraste um card aqui, ou de um dia da semana para aqui.</div>';
+  semDiaEl.innerHTML = semDiaGroups.length
+    ? semDiaGroups.map(gr=>agendaGroupHtml(gr,null)).join('')
+    : '<div class="agenda-empty-day">Nenhuma visita sem dia definido nesta semana. Arraste um card para cá.</div>';
   window._agendaCurrentMonday=mondayIso;
+}
+
+function agendaGroupHtml(gr, dIso){
+  if(gr.items.length===1){
+    return agendaCardHtml(gr.items[0], dIso);
+  }
+  return `<div class="agenda-group">
+    <div class="agenda-group-hdr" draggable="true" ondragstart="agendaGroupDragStart(event,'${dIso||''}',${gr.g})">
+      ${icn('route')}<span>Bloco de visita · ${gr.items.length} clientes</span>
+      <span style="margin-left:auto;cursor:grab" title="Arraste para mover o bloco inteiro">${icn('grip')}</span>
+    </div>
+    ${gr.items.map(a=>agendaCardHtml(a,dIso)).join('')}
+  </div>`;
 }
 
 function agendaCardHtml(a,dIso){
   const statusCls = a.status==='Realizada'?'ag-realizada':a.status==='Cancelada'?'ag-cancelada':a.status==='Não atendeu'?'ag-naoatendeu':'ag-pendente';
   const meta=[a.periodo,a.horario].filter(Boolean).join(' · ');
-  const ordemBadge = (dIso && a.ordem) ? `<span class="ag-ordem-badge">${a.ordem}º</span>` : '';
-  const dragAttrs = `draggable="true" ondragstart="agendaDragStart(event,${a._r})"`;
-  const dropOnCardAttrs = dIso ? `ondragover="agendaAllowDrop(event)" ondrop="agendaDropOnCard(event,'${dIso}',${a._r})"` : '';
-  return `<div class="agenda-card ${statusCls}" ${dragAttrs} ${dropOnCardAttrs}>
-    ${ordemBadge}
+  const dropAttrs = `ondragover="agendaAllowDrop(event)" ondrop="agendaDropOnCard(event,'${dIso||''}',${a._r})" ondragenter="this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')"`;
+  return `<div class="agenda-card ${statusCls}" draggable="true" ondragstart="agendaDragStart(event,${a._r})" ${dropAttrs}>
     <div class="ag-card-name">${escH(a.cliente)}</div>
     ${meta?`<div class="ag-card-meta">${escH(meta)}</div>`:''}
     ${a.obs?`<div class="ag-card-obs">${escH(a.obs)}</div>`:''}
     <div class="ag-card-status">${a.status}${a.rep?` · ${a.rep}`:''}</div>
     <div class="ag-card-actions">
-      ${a.status==='Pendente'?`<button onclick="markStatus(${a._r},'Realizada')" title="Visitado com sucesso">✓</button>`:''}
-      ${a.status==='Pendente'?`<button onclick="markStatus(${a._r},'Não atendeu')" title="Não atendeu / não deu certo">⚠</button>`:''}
-      ${a.status==='Pendente'?`<button onclick="markStatus(${a._r},'Cancelada')" title="Cancelar">✕</button>`:''}
-      ${(dIso&&a.ordem)?`<button onclick="agendaClearOrder(${a._r})" title="Remover da ordem">🔓</button>`:''}
-      <button onclick="openAgendaModal(${a._r})" title="Editar">✏</button>
-      <button onclick="deleteAgendaEntry(${a._r})" title="Excluir">🗑</button>
+      ${a.status==='Pendente'?`<button class="act-done" onclick="markStatus(${a._r},'Realizada')" title="Visitado com sucesso">${icn('check')}</button>`:''}
+      ${a.status==='Pendente'?`<button class="act-warn" onclick="markStatus(${a._r},'Não atendeu')" title="Não atendeu / não deu certo">${icn('alert')}</button>`:''}
+      ${a.status==='Pendente'?`<button class="act-danger" onclick="markStatus(${a._r},'Cancelada')" title="Cancelar">${icn('x')}</button>`:''}
+      <button onclick="openAgendaModal(${a._r})" title="Editar">${icn('edit')}</button>
+      <button class="act-danger" onclick="deleteAgendaEntry(${a._r})" title="Excluir">${icn('trash')}</button>
     </div>
   </div>`;
 }
 
-// ── Drag & drop ──────────────────────────────────────────────────────────
-let agendaDragRow=null;
+// ── Arrastar e soltar ────────────────────────────────────────────────────
+let agendaDragPayload=null;
 function agendaDragStart(e,row){
-  agendaDragRow=row;
-  e.dataTransfer.setData('text/plain', String(row));
+  agendaDragPayload=`card:${row}`;
+  e.dataTransfer.setData('text/plain', agendaDragPayload);
+  e.dataTransfer.effectAllowed='move';
+}
+function agendaGroupDragStart(e,dIso,g){
+  agendaDragPayload=`group:${dIso}:${g}`;
+  e.dataTransfer.setData('text/plain', agendaDragPayload);
   e.dataTransfer.effectAllowed='move';
 }
 function agendaAllowDrop(e){ e.preventDefault(); e.dataTransfer.dropEffect='move'; }
 
 async function agendaDropOnDay(e, dIso){
   e.preventDefault(); e.stopPropagation();
-  const rowNum = agendaDragRow || Number(e.dataTransfer.getData('text/plain'));
-  await agendaMoveToDay(rowNum, dIso, null);
+  e.currentTarget.classList.remove('drag-over');
+  const raw=e.dataTransfer.getData('text/plain')||agendaDragPayload;
+  if(!raw) return;
+  const [type,...rest]=raw.split(':');
+  if(type==='card'){
+    await agendaMoveSingle(Number(rest[0]), dIso);
+  } else if(type==='group'){
+    const fromDia=rest[0], g=Number(rest[1]);
+    await agendaMoveGroup(fromDia, g, dIso);
+  }
 }
 async function agendaDropOnCard(e, dIso, targetRow){
   e.preventDefault(); e.stopPropagation();
-  const rowNum = agendaDragRow || Number(e.dataTransfer.getData('text/plain'));
-  if(rowNum===targetRow) return;
-  await agendaMoveToDay(rowNum, dIso, targetRow);
+  e.currentTarget.classList.remove('drag-over');
+  const raw=e.dataTransfer.getData('text/plain')||agendaDragPayload;
+  if(!raw) return;
+  const [type,...rest]=raw.split(':');
+  if(type==='card'){
+    const rowNum=Number(rest[0]);
+    if(rowNum===targetRow) return;
+    await agendaJoinGroup(rowNum, dIso, targetRow);
+  } else if(type==='group'){
+    const fromDia=rest[0], g=Number(rest[1]);
+    await agendaMergeGroupOntoCard(fromDia, g, dIso, targetRow);
+  }
 }
 async function agendaDropOnSemDia(e){
   e.preventDefault(); e.stopPropagation();
-  const rowNum = agendaDragRow || Number(e.dataTransfer.getData('text/plain'));
-  const a=AGENDA.find(x=>x._r===rowNum); if(!a) return;
-  a.dia=''; a.ordem='';
-  try{ await agendaPersistEntry(a); renderAgendaTab(); }
-  catch(err){ showToast(err.message,'err'); loadAgendaData(); }
-}
-async function agendaMoveToDay(rowNum, dIso, targetRow){
-  const a=AGENDA.find(x=>x._r===rowNum); if(!a) return;
-  a.dia=dIso;
-  a.semana=isoDate(mondayOf(new Date(dIso+'T00:00:00')));
-  let dayEntries=agendaSortDay(AGENDA.filter(x=>x.dia===dIso && x._r!==rowNum && agendaEntryMatchesRep(x)));
-  let insertAt=dayEntries.length;
-  if(targetRow){
-    const idx=dayEntries.findIndex(x=>x._r===targetRow);
-    if(idx>=0) insertAt=idx;
+  const raw=e.dataTransfer.getData('text/plain')||agendaDragPayload;
+  if(!raw) return;
+  const [type,...rest]=raw.split(':');
+  if(type==='card'){
+    const a=AGENDA.find(x=>x._r===Number(rest[0])); if(!a) return;
+    a.dia=''; a.ordem='';
+    await agendaPersistBatch([a]); renderAgendaTab();
+  } else if(type==='group'){
+    const fromDia=rest[0], g=Number(rest[1]);
+    const items=AGENDA.filter(x=>x.dia===fromDia && parseOrdem(x).g===g);
+    const newG=nextGroupId();
+    items.sort((x,y)=>parseOrdem(x).p-parseOrdem(y).p).forEach((x,i)=>{ x.dia=''; x.ordem=`${newG}-${i+1}`; });
+    await agendaPersistBatch(items); renderAgendaTab();
   }
-  dayEntries.splice(insertAt,0,a);
-  const updates=[];
-  dayEntries.forEach((x,i)=>{
-    const newOrdem=String(i+1);
-    if(x.ordem!==newOrdem){ x.ordem=newOrdem; updates.push(x); }
-  });
-  if(!updates.includes(a)) updates.push(a);
-  try{
-    setSyncState('syncing','Salvando...');
-    for(const x of updates){ await agendaPersistEntry(x); }
-    setSyncState('ok','Sincronizado');
-    renderAgendaTab();
-  }catch(err){ setSyncState('error','Erro'); showToast(err.message,'err'); loadAgendaData(); }
 }
-async function agendaPersistEntry(a){
-  const rowArr=[a.cliente,a.clienteRow,a.semana,a.dia,a.periodo,a.horario,a.obs,a.status,a.rep,a.ordem];
-  await agendaWrite('agendaUpdate', a._r, rowArr);
-}
-function agendaClearOrder(rowNum){
+
+async function agendaMoveSingle(rowNum, dIso){
   const a=AGENDA.find(x=>x._r===rowNum); if(!a) return;
+  if(a.dia===dIso && !a.ordem) return;
+  a.dia=dIso; a.semana=isoDate(mondayOf(new Date(dIso+'T00:00:00')));
   a.ordem='';
-  agendaPersistEntry(a).then(()=>renderAgendaTab()).catch(err=>showToast(err.message,'err'));
+  await agendaPersistBatch([a]);
+  renderAgendaTab();
+}
+async function agendaMoveGroup(fromDia, g, toDia){
+  if(fromDia===toDia) return;
+  const items=AGENDA.filter(x=>x.dia===fromDia && parseOrdem(x).g===g).sort((x,y)=>parseOrdem(x).p-parseOrdem(y).p);
+  if(!items.length) return;
+  const newG=nextGroupId();
+  const newSemana=isoDate(mondayOf(new Date(toDia+'T00:00:00')));
+  items.forEach((x,i)=>{ x.dia=toDia; x.semana=newSemana; x.ordem=`${newG}-${i+1}`; });
+  await agendaPersistBatch(items);
+  renderAgendaTab();
+}
+async function agendaJoinGroup(rowNum, dIso, targetRow){
+  const a=AGENDA.find(x=>x._r===rowNum); if(!a) return;
+  const target=AGENDA.find(x=>x._r===targetRow); if(!target) return;
+  const {g:tg}=parseOrdem(target);
+  const groupItems=AGENDA.filter(x=>x.dia===dIso && parseOrdem(x).g===tg && x._r!==rowNum);
+  const maxP=groupItems.reduce((m,x)=>Math.max(m,parseOrdem(x).p),0);
+  a.dia=dIso; a.semana=isoDate(mondayOf(new Date(dIso+'T00:00:00')));
+  a.ordem=`${tg}-${maxP+1}`;
+  await agendaPersistBatch([a]);
+  renderAgendaTab();
+}
+async function agendaMergeGroupOntoCard(fromDia, g, dIso, targetRow){
+  const target=AGENDA.find(x=>x._r===targetRow); if(!target) return;
+  const {g:tg}=parseOrdem(target);
+  const movingItems=AGENDA.filter(x=>x.dia===fromDia && parseOrdem(x).g===g).sort((x,y)=>parseOrdem(x).p-parseOrdem(y).p);
+  if(!movingItems.length) return;
+  const destItems=AGENDA.filter(x=>x.dia===dIso && parseOrdem(x).g===tg && !movingItems.includes(x));
+  let maxP=destItems.reduce((m,x)=>Math.max(m,parseOrdem(x).p),0);
+  const newSemana=isoDate(mondayOf(new Date(dIso+'T00:00:00')));
+  movingItems.forEach(x=>{ maxP++; x.dia=dIso; x.semana=newSemana; x.ordem=`${tg}-${maxP}`; });
+  await agendaPersistBatch(movingItems);
+  renderAgendaTab();
 }
 
 function agendaPrevWeek(){agendaWeekOffset--;renderAgendaTab();}
