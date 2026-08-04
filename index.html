@@ -632,6 +632,8 @@ body { font-family: var(--font); background: var(--off); color: var(--text); min
 }
 .agenda-group-hdr:active { cursor: grabbing; }
 .agenda-group-hdr .icn { color: var(--blue); }
+.ag-group-name { cursor: pointer; text-decoration: underline dotted; text-decoration-color: rgba(60,110,210,.4); text-underline-offset: 2px; }
+.ag-group-name:hover { color: var(--navy); }
 
 .agenda-card {
   background: var(--white); border: 1px solid var(--border); border-left: 4px solid var(--sky);
@@ -1942,13 +1944,65 @@ function weekLabel(mondayIso){
   return `${fmt(m)} – ${fmt(sun)}`;
 }
 
-// ── Nota de cidade/região por dia (guardada localmente no navegador) ────
-function agendaDayNoteKey(dIso){return 'agendaDayNote_'+dIso;}
-function agendaGetDayNote(dIso){return localStorage.getItem(agendaDayNoteKey(dIso))||'';}
-function agendaSetDayNote(dIso,val){
+// ── Notas de dia (cidade/região) e nomes de bloco — guardados na planilha,
+// aba "AgendaConfig" (colunas: Tipo, Chave, Valor), para sincronizar entre
+// dispositivos. Tipo = 'dia_nota' (Chave=data ISO) ou 'grupo_nome' (Chave=id do bloco).
+let AGENDA_DAY_NOTES={}, AGENDA_GROUP_NAMES={};
+async function agendaConfigRead(){
+  const url=`${API_BASE}/${CFG.id}/values/AgendaConfig!A1:C2000?key=${CFG.key}`;
+  const r=await fetch(url);
+  if(!r.ok){const e=await r.json();throw new Error(e.error?.message||'Erro API (AgendaConfig)');}
+  return r.json();
+}
+async function loadAgendaConfig(){
+  try{
+    const data=await agendaConfigRead();
+    const rows=data.values||[];
+    AGENDA_DAY_NOTES={}; AGENDA_GROUP_NAMES={};
+    for(let r=1;r<rows.length;r++){
+      const row=rows[r]||[];
+      const tipo=row[0], chave=row[1], valor=row[2]||'';
+      if(!tipo||!chave) continue;
+      if(tipo==='dia_nota') AGENDA_DAY_NOTES[chave]=valor;
+      else if(tipo==='grupo_nome') AGENDA_GROUP_NAMES[chave]=valor;
+    }
+  }catch(e){
+    // Aba "AgendaConfig" pode ainda não existir — não trava o resto da agenda.
+    console.warn('AgendaConfig não pôde ser lida:', e.message);
+  }
+}
+async function agendaConfigSet(tipo,chave,valor){
+  return withTimeout((async()=>{
+    const r=await fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'configSet',tipo,chave,valor})});
+    const txt=await r.text();
+    let j;try{j=JSON.parse(txt);}catch{throw new Error('Resposta inválida');}
+    if(j.status!=='ok') throw new Error(j.message||'Erro ao salvar');
+    return j;
+  })(), 20000, 'salvar configuração da agenda');
+}
+function agendaGetDayNote(dIso){return AGENDA_DAY_NOTES[dIso]||'';}
+async function agendaSetDayNote(dIso,val){
   val=(val||'').trim();
-  if(val) localStorage.setItem(agendaDayNoteKey(dIso),val);
-  else localStorage.removeItem(agendaDayNoteKey(dIso));
+  AGENDA_DAY_NOTES[dIso]=val;
+  try{ await agendaConfigSet('dia_nota', dIso, val); }
+  catch(err){ showToast('Não foi possível salvar a nota: '+err.message,'err'); }
+}
+async function agendaRenameGroup(g){
+  const current=AGENDA_GROUP_NAMES[g]||'';
+  const name=prompt('Nome do bloco de visita (ex: "Rota Zona Sul", "Região de Sumaré"):', current);
+  if(name===null) return;
+  const trimmed=name.trim();
+  AGENDA_GROUP_NAMES[g]=trimmed;
+  try{
+    await agendaConfigSet('grupo_nome', String(g), trimmed);
+    renderAgendaTab();
+  }catch(err){ showToast('Não foi possível salvar o nome: '+err.message,'err'); }
+}
+async function agendaCarryGroupName(oldG,newG){
+  const name=AGENDA_GROUP_NAMES[oldG];
+  if(!name) return;
+  AGENDA_GROUP_NAMES[newG]=name;
+  try{ await agendaConfigSet('grupo_nome', String(newG), name); }catch(e){}
 }
 
 // ── Leitura/escrita na planilha ──────────────────────────────────────────
@@ -1993,6 +2047,7 @@ async function agendaPersistBatch(items){
 async function loadAgendaData(){
   document.getElementById('agendaGrid').innerHTML=`<div class="loading"><div class="spinner"></div><p>Carregando agenda...</p></div>`;
   try{
+    await loadAgendaConfig();
     const data=await agendaRead();
     const rows=data.values||[];
     AGENDA=[];
@@ -2082,9 +2137,11 @@ function agendaGroupHtml(gr, dIso){
   if(gr.items.length===1){
     return agendaCardHtml(gr.items[0], dIso);
   }
+  const name = AGENDA_GROUP_NAMES[gr.g] || `Bloco de visita · ${gr.items.length} clientes`;
   return `<div class="agenda-group">
     <div class="agenda-group-hdr" draggable="true" ondragstart="agendaGroupDragStart(event,'${dIso||''}',${gr.g})">
-      ${icn('route')}<span>Bloco de visita · ${gr.items.length} clientes</span>
+      ${icn('route')}
+      <span class="ag-group-name" onclick="event.stopPropagation();agendaRenameGroup(${gr.g})" title="Clique para nomear este bloco">${escH(name)}</span>
       <span style="margin-left:auto;cursor:grab" title="Arraste para mover o bloco inteiro">${icn('grip')}</span>
     </div>
     ${gr.items.map(a=>agendaCardHtml(a,dIso)).join('')}
@@ -2166,6 +2223,7 @@ async function agendaDropOnSemDia(e){
     const items=AGENDA.filter(x=>x.dia===fromDia && parseOrdem(x).g===g);
     const newG=nextGroupId();
     items.sort((x,y)=>parseOrdem(x).p-parseOrdem(y).p).forEach((x,i)=>{ x.dia=''; x.ordem=`${newG}-${i+1}`; });
+    await agendaCarryGroupName(g,newG);
     await agendaPersistBatch(items); renderAgendaTab();
   }
 }
@@ -2185,6 +2243,7 @@ async function agendaMoveGroup(fromDia, g, toDia){
   const newG=nextGroupId();
   const newSemana=isoDate(mondayOf(new Date(toDia+'T00:00:00')));
   items.forEach((x,i)=>{ x.dia=toDia; x.semana=newSemana; x.ordem=`${newG}-${i+1}`; });
+  await agendaCarryGroupName(g,newG);
   await agendaPersistBatch(items);
   renderAgendaTab();
 }
