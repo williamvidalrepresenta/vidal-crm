@@ -628,12 +628,19 @@ body { font-family: var(--font); background: var(--off); color: var(--text); min
 }
 .agenda-group-hdr {
   display: flex; align-items: center; gap: 6px; font-size: 10.5px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: .5px; color: var(--blue); padding: 2px 4px 0; cursor: grab;
+  text-transform: uppercase; letter-spacing: .5px; color: var(--blue); padding: 2px 4px 0;
 }
-.agenda-group-hdr:active { cursor: grabbing; }
 .agenda-group-hdr .icn { color: var(--blue); }
-.ag-group-name { cursor: pointer; text-decoration: underline dotted; text-decoration-color: rgba(60,110,210,.4); text-underline-offset: 2px; }
+.ag-group-name { cursor: pointer; text-decoration: underline dotted; text-decoration-color: rgba(60,110,210,.4); text-underline-offset: 2px; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ag-group-name:hover { color: var(--navy); }
+.ag-group-right { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+.ag-group-right button {
+  border: none; background: transparent; color: var(--blue); cursor: pointer;
+  width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border-radius: 6px;
+}
+.ag-group-right button:hover { background: rgba(60,110,210,.12); }
+.ag-group-grip { cursor: grab; display: flex; align-items: center; justify-content: center; width: 22px; height: 22px; }
+.ag-group-grip:active { cursor: grabbing; }
 
 .agenda-card {
   background: var(--white); border: 1px solid var(--border); border-left: 4px solid var(--sky);
@@ -1907,7 +1914,8 @@ const ICN = {
   grip:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="6" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="18" r="1"/><circle cx="15" cy="6" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="18" r="1"/></svg>',
   pin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>',
   route:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M10 19h4a4 4 0 0 0 4-4v-1a4 4 0 0 0-4-4H8a4 4 0 0 1-4-4"/></svg>',
-  calendar:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>'
+  calendar:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+  ff:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>'
 };
 function icn(name,extraCls){return `<span class="icn ${extraCls||''}">${ICN[name]||''}</span>`;}
 
@@ -2142,7 +2150,10 @@ function agendaGroupHtml(gr, dIso){
     <div class="agenda-group-hdr" draggable="true" ondragstart="agendaGroupDragStart(event,'${dIso||''}',${gr.g})">
       ${icn('route')}
       <span class="ag-group-name" onclick="event.stopPropagation();agendaRenameGroup(${gr.g})" title="Clique para nomear este bloco">${escH(name)}</span>
-      <span style="margin-left:auto;cursor:grab" title="Arraste para mover o bloco inteiro">${icn('grip')}</span>
+      <span class="ag-group-right">
+        <button onclick="event.stopPropagation();agendaPostponeGroup('${dIso||''}',${gr.g})" title="Adiar bloco inteiro para a semana seguinte">${icn('ff')}</button>
+        <span class="ag-group-grip" title="Arraste para mover o bloco inteiro">${icn('grip')}</span>
+      </span>
     </div>
     ${gr.items.map(a=>agendaCardHtml(a,dIso)).join('')}
   </div>`;
@@ -2161,6 +2172,7 @@ function agendaCardHtml(a,dIso){
       ${a.status==='Pendente'?`<button class="act-done" onclick="markStatus(${a._r},'Realizada')" title="Visitado com sucesso">${icn('check')}</button>`:''}
       ${a.status==='Pendente'?`<button class="act-warn" onclick="markStatus(${a._r},'Não atendeu')" title="Não atendeu / não deu certo">${icn('alert')}</button>`:''}
       ${a.status==='Pendente'?`<button class="act-danger" onclick="markStatus(${a._r},'Cancelada')" title="Cancelar">${icn('x')}</button>`:''}
+      ${a.status==='Pendente'?`<button onclick="agendaPostponeSingle(${a._r})" title="Adiar para a semana seguinte">${icn('ff')}</button>`:''}
       <button onclick="openAgendaModal(${a._r})" title="Editar">${icn('edit')}</button>
       <button class="act-danger" onclick="deleteAgendaEntry(${a._r})" title="Excluir">${icn('trash')}</button>
     </div>
@@ -2234,6 +2246,36 @@ async function agendaMoveSingle(rowNum, dIso){
   a.dia=dIso; a.semana=isoDate(mondayOf(new Date(dIso+'T00:00:00')));
   a.ordem='';
   await agendaPersistBatch([a]);
+  renderAgendaTab();
+}
+async function agendaPostponeSingle(rowNum){
+  const a=AGENDA.find(x=>x._r===rowNum); if(!a) return;
+  if(a.dia){
+    const newDia=addDays(new Date(a.dia+'T00:00:00'),7);
+    a.dia=isoDate(newDia); a.semana=isoDate(mondayOf(newDia));
+  } else {
+    const newSemanaDate=addDays(new Date(a.semana+'T00:00:00'),7);
+    a.semana=isoDate(mondayOf(newSemanaDate));
+  }
+  await agendaPersistBatch([a]);
+  showToast('Visita adiada para a semana seguinte ✓','ok');
+  renderAgendaTab();
+}
+async function agendaPostponeGroup(dIso,g){
+  const key=dIso||'';
+  const items=AGENDA.filter(x=>(x.dia||'')===key && parseOrdem(x).g===g);
+  if(!items.length) return;
+  items.forEach(a=>{
+    if(a.dia){
+      const newDia=addDays(new Date(a.dia+'T00:00:00'),7);
+      a.dia=isoDate(newDia); a.semana=isoDate(mondayOf(newDia));
+    } else {
+      const newSemanaDate=addDays(new Date(a.semana+'T00:00:00'),7);
+      a.semana=isoDate(mondayOf(newSemanaDate));
+    }
+  });
+  await agendaPersistBatch(items);
+  showToast('Bloco adiado para a semana seguinte ✓','ok');
   renderAgendaTab();
 }
 async function agendaMoveGroup(fromDia, g, toDia){
